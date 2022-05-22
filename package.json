@@ -1,0 +1,32 @@
+{
+  "name": "learn-express",
+  "version": "1.0.0",
+  "description": "full stack vue , express and mongodb application",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "serve": "nodemon app.js",
+    "client-install": "npm install --prefix client",
+    "client": "npm run serve --prefix client",
+    "dev": "concurrently 'npm run serve' 'npm run client'"
+  },
+  "author": "paulette",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "concurrently": "^7.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^4.1.2",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.3.3",
+    "passport": "^0.5.3",
+    "passport-jwt": "^4.0.0",
+    "sequelize": "^6.19.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  }
+}
