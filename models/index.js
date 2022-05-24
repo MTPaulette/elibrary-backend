@@ -165,18 +165,83 @@ myModels.Correction.belongsTo(myModels.Enseignant)
 myModels.Enseignant.hasMany(myModels.Correction, { foreignKey: {name:'idEnseignantSupprimeur'}});
 myModels.Correction.belongsTo(myModels.Enseignant)
 
-//tp a un ou n Correction
-myModels.tp.hasMany(myModels.Correction);
-myModels.Correction.belongsTo(myModels.tp)
+//td a un ou n Correction
+myModels.Td.hasMany(myModels.Correction);
+myModels.Correction.belongsTo(myModels.Td)
 
 //epreuve a un ou n Correction
 myModels.Epreuve.hasMany(myModels.Correction);
 myModels.Correction.belongsTo(myModels.Epreuve)
 
+//faculte a un ou n etudiant
+myModels.Faculte.hasMany(myModels.Etudiant);
+myModels.Etudiant.belongsTo(myModels.Faculte);
+
+//Filiere a un ou n cours
+myModels.Filiere.hasMany(myModels.Etudiant);
+myModels.Etudiant.belongsTo(myModels.Filiere);
+
+//niveau a un ou n cours
+myModels.Niveau.hasMany(myModels.Etudiant);
+myModels.Etudiant.belongsTo(myModels.Niveau);
+
+//specialite a un ou n cours
+myModels.Specialite.hasMany(myModels.Etudiant);
+myModels.Etudiant.belongsTo(myModels.Specialite);
+
 
 /**
  * module document
  */
+
+//Cours a n ou n domaine
+myModels.Cours.belongsToMany(myModels.Domaine, {through: 'coursDomaine'});
+myModels.Domaine.belongsToMany(myModels.Cours, {through: 'coursDomaine'});
+
+//livre a n ou n domaine
+myModels.Livre.belongsToMany(myModels.Domaine, {through: 'domaineLivre'});
+myModels.Domaine.belongsToMany(myModels.Livre, {through: 'domaineLivre'});
+
+//livre envoie un ou n signalement
+myModels.Livre.hasMany(myModels.Signalement, { foreignKey: {allowNull: false}});
+myModels.Signalement.belongsTo(myModels.Livre);
+
+/**
+ * module faculte , filiere, specialite
+ */
+
+//faculte a un ou n cours
+myModels.Faculte.hasMany(myModels.Cours);
+myModels.Cours.belongsTo(myModels.Faculte);
+
+//Filiere a un ou n cours
+myModels.Filiere.hasMany(myModels.Cours);
+myModels.Cours.belongsTo(myModels.Filiere);
+
+//niveau a un ou n cours
+myModels.Niveau.hasMany(myModels.Cours);
+myModels.Cours.belongsTo(myModels.Niveau);
+
+//specialite a un ou n cours
+myModels.Specialite.hasMany(myModels.Cours);
+myModels.Cours.belongsTo(myModels.Specialite);
+
+//faculte a un ou n fliere
+myModels.Faculte.hasMany(myModels.Filiere);
+myModels.Filiere.belongsTo(myModels.Faculte);
+
+//filiere a un ou n specialite
+myModels.Filiere.hasMany(myModels.Specialite);
+myModels.Specialite.belongsTo(myModels.Filiere);
+
+//filiere a n ou n Niveau
+myModels.Filiere.belongsToMany(myModels.Niveau, {through: 'filiereNiveau'});
+myModels.Niveau.belongsToMany(myModels.Filiere, {through: 'filiereNiveau'});
+
+//specialite a n ou n Niveau
+myModels.Specialite.belongsToMany(myModels.Niveau, {through: 'filiereNiveau'});
+myModels.Niveau.belongsToMany(myModels.Specialite, {through: 'filiereNiveau'});
+
 
 //myModels.User.belongsToMany(myModels.Document, {through: 'C'});
 //myModels.Document.belongsToMany(myModels.User, {through: 'C'});
