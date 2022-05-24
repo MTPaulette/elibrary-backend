@@ -102,7 +102,7 @@ exports.create = async (req, res) => {
 };
 
 //user login
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
 
     let { login, email,password } = req.body;
     const user = await User.findOne ({
@@ -112,12 +112,13 @@ exports.login = async (req, res) => {
     })
 
     if(!user) {
-        return res.status(404).json({
+        return res.status(204).json({
             msg: "Email pas trouvé",
-            success: false
+            success: false,
+            email: false,
+            password: false
         });
     }
-        
     
     //if there is user we are now going to compare the password
     bcrypt.compare(password, user.password).then(isMatch => {
@@ -134,12 +135,17 @@ exports.login = async (req, res) => {
                 return res.status(200).json({
                     success: true,
                     token: 'Bearer '+ token,
-                    msg: "Bingo!!! vous êtes connectés"
+                    user: user,
+                    msg: "Bingo!!! vous êtes connectés",
+                    password: true,
+                    email: true
                 });
             })
         }else {
-            return res.status(404).json({
+            return res.status(204).json({
                 msg: "mot de passe incorrect",
+                success: false,
+                password: false
             });
         }
     });
