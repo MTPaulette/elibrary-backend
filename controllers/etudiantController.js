@@ -1,4 +1,4 @@
-const User = require("../models/index").User;
+const Etudiant = require("../models/index").Etudiant;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const key = require("../models/index").key;
@@ -50,7 +50,7 @@ exports.create = async (req, res) => {
     }
     
     //check for the unique login
-    const userWithLogin = await User.findOne ({
+    const userWithLogin = await Etudiant.findOne ({
         where: {
             login: login
         }
@@ -64,7 +64,7 @@ exports.create = async (req, res) => {
     //});
 
     //check for the unique email
-    const userWithEmail = await User.findOne ({
+    const userWithEmail = await Etudiant.findOne ({
         where: {
             email: email
         }
@@ -77,7 +77,7 @@ exports.create = async (req, res) => {
     }
 
     //the data is valid and now we can register the user
-    let newUser = new User({
+    let newEtudiant = new Etudiant({
         login,
         email,
         password
@@ -85,10 +85,10 @@ exports.create = async (req, res) => {
     
     //hash the password
     bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(newUser.password, salt, (err, hash) => {
+        bcrypt.hash(newEtudiant.password, salt, (err, hash) => {
             if(err) throw errow;
-            newUser.password = hash;
-            newUser.save().then(user => {
+            newEtudiant.password = hash;
+            newEtudiant.save().then(user => {
                 return res.status(201).json({
                     success: true,
                     msg: "user registred successfully",
@@ -103,7 +103,7 @@ exports.create = async (req, res) => {
 exports.login = async (req, res, next) => {
 
     let { login, email,password } = req.body;
-    const user = await User.findOne ({
+    const user = await Etudiant.findOne ({
         where: {
             email: email
         }
@@ -153,7 +153,7 @@ exports.login = async (req, res, next) => {
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const Model = require('../../models/index');
-const User = Model.User;
+const Etudiant = Model.Etudiant;
 const key = Model.key;
 
 /*
@@ -163,7 +163,7 @@ opts.secretOrKey = key;
 
 console.log(jwt_payload);
     const strategy = new JwtStrategy(opts, (jwt_payload, done) => {
-            User.findById(jwt_payload._id).then(user => {
+            Etudiant.findById(jwt_payload._id).then(user => {
                 if(user) return done(null, user);
                 return done(null, false);
             }).catch(err => {
