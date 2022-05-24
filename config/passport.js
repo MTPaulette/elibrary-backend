@@ -12,7 +12,6 @@ opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = key;
 
 const strategy = new JwtStrategy(opts, async (jwt_payload, done) => {
-
     await User.findByPk(jwt_payload._id).then(user => {
         if(user) return done(null, user);
         return done(null, false);

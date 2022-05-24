@@ -1,13 +1,9 @@
 module.exports = (sequelize,Sequelize) => {
-    const User = sequelize.define('User', {
+    const Admin = sequelize.define('Admin', {
         id: {
             type: Sequelize.INTEGER,
             autoIncrement: true,
             primaryKey: true
-        },
-        login: {
-            type: Sequelize.STRING,
-            allowNull: false
         },
         email: {
             type: Sequelize.STRING,
@@ -22,6 +18,6 @@ module.exports = (sequelize,Sequelize) => {
     {
         timestamps: true,
     });
-    return User;
+    return Admin;
 };
 

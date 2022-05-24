@@ -1,27 +1,36 @@
 module.exports = (sequelize,Sequelize) => {
-    const User = sequelize.define('User', {
+    const Correction = sequelize.define('Correction', {
         id: {
             type: Sequelize.INTEGER,
             autoIncrement: true,
             primaryKey: true
         },
-        login: {
+        titre: {
             type: Sequelize.STRING,
             allowNull: false
         },
-        email: {
+        contenu: {
             type: Sequelize.STRING,
             allowNull: false,
-            unique: true
         },
-        password: {
+        objectif: {
+            type: Sequelize.TEXT,
+            allowNull: true
+        },
+        etat: {
             type: Sequelize.STRING,
-            allowNull: false
+            allowNull: true,
+            default: 'actif'
+        },
+        nbTelechargement: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+            default: 0,
         }
     },
     {
         timestamps: true,
     });
-    return User;
+    return Correction;
 };
 

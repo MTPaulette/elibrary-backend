@@ -35,13 +35,11 @@ app.use(passport.initialize());
 //bring in passport strategy
 require('./config/passport');
 
-/*
-  //connection to a database
-  const db = require("./models");
-  db.sequelize.sync({ alter: true }).then(() => {
-    console.log("drop and re-sync the database if it contains existing tables");
-  })
-*/
+//connection to a database
+const db = require("./models");
+db.sequelize.sync({ alter: true }).then(() => {
+  console.log("drop and re-sync the database if it contains existing tables");
+})
 
 //bring in the Users route
 const users = require('./routes/api/users');

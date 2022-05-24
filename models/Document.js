@@ -1,21 +1,27 @@
-/*
-const { sequelize, Sequelize } = require(".");
-
 module.exports = (sequelize,Sequelize) => {
-    const Document = sequelize.define('document', {
-        email: {
+    const Document = sequelize.define('Document', {
+        id: {
+            type: Sequelize.INTEGER,
+            autoIncrement: true,
+            primaryKey: true
+        },
+        titre: {
             type: Sequelize.STRING,
-            required: true
+            allowNull: false
         },
-        password: {
-            type: String,
-            required: true
+        resume: {
+            type: Sequelize.STRING,
+            allowNull: false,
+            unique: true
         },
-        date: {
-            type: Date,
-            default: Date.now
-        },
+        auteur: {
+            type: Sequelize.STRING,
+            allowNull: false
+        }
+    },
+    {
+        timestamps: true,
     });
     return Document;
 };
-*/
+

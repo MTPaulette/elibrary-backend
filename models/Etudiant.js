@@ -1,12 +1,12 @@
 module.exports = (sequelize,Sequelize) => {
-    const User = sequelize.define('User', {
+    const Etudiant = sequelize.define('Etudiant', {
         id: {
             type: Sequelize.INTEGER,
             autoIncrement: true,
             primaryKey: true
         },
-        login: {
-            type: Sequelize.STRING,
+        nom: {
+            type: Sequelize.TEXT,
             allowNull: false
         },
         email: {
@@ -22,6 +22,6 @@ module.exports = (sequelize,Sequelize) => {
     {
         timestamps: true,
     });
-    return User;
+    return Etudiant;
 };
 
