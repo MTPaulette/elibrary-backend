@@ -32,9 +32,19 @@ router.post('/login',(req,res) => {UserController.login(req,res)});
 
 
 router.get('/profile', passport.authenticate('jwt', { session: false }), (req, res) => {
-    return res.json({
-        user: req.user,
-    });
+    const role = req.user.role;
+    if (role == 'admin') {
+        return res.json({
+            user: req.user,
+            msgSucces: 'cest un admin'
+        });  
+    } else {
+        return res.json({
+            user: req.user,
+            msgError: 'cest un utilisateur'
+        });
+        
+    }
 });
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-const UserController = require('../../controllers/userController');
+const EtudiantController = require('../../controllers/etudiantController');
 const jwt = require('jsonwebtoken');
 
 //require('../../config/passport');
@@ -12,28 +12,28 @@ router.get('/',(req,res) => {
 
 
 /**
- * @route POST api/users/register
- * @desc Register the user
+ * @route POST api/etudiants/register
+ * @desc Register the etudiant
  * @access Public
  */
 router.post('/register',(req,res) => {EtudiantController.create(req,res)});
 
 /**
- * @route POST api/users/login
- * @desc login the user
+ * @route POST api/etudiants/login
+ * @desc login the etudiant
  * @access Public
  */
 router.post('/login',(req,res) => {EtudiantController.login(req,res)});
 /**
- * @route get api/users/profile
- * @desc get the user's data
+ * @route get api/etudiants/profile
+ * @desc get the etudiant's data
  * @access Public
  */
 
 
 router.get('/profile', passport.authenticate('jwt', { session: false }), (req, res) => {
     return res.json({
-        user: req.user,
+        etudiant: req.etudiant,
     });
 });
 

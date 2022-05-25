@@ -1,6 +1,8 @@
 const User = require("../models/index").User;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const passport = require('passport');
+const passportjS = require('../middleware/passport').passport;
 const key = require("../models/index").key;
 
 const { Op } = require("sequelize");
@@ -102,7 +104,7 @@ exports.create = async (req, res) => {
 //user login
 exports.login = async (req, res, next) => {
 
-    let { login, email,password } = req.body;
+    let { email,password } = req.body;
     const user = await User.findOne ({
         where: {
             email: email
@@ -123,9 +125,9 @@ exports.login = async (req, res, next) => {
         if(isMatch) {
             const jwt_payload = {
                 _id: user.id,
-                login: user.login,
                 email: user.email,
-                password: user.password
+                password: user.password,
+                //role: 'utilisateur'
             }
             jwt.sign(jwt_payload, key, {
                 expiresIn: 604800

@@ -21,7 +21,7 @@ module.exports = (sequelize,Sequelize) => {
         etat: {
             type: Sequelize.STRING,
             allowNull: false,
-            default: 'actif'
+            defaultValue: 'actif'
         }
     },
     {

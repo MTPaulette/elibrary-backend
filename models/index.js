@@ -53,6 +53,7 @@ const myModels = {
     Specialite : require('./Specialite')(sequelize,Sequelize),
     Td : require('./Td')(sequelize,Sequelize),
     Ue : require('./Ue')(sequelize,Sequelize),
+    User : require('./User')(sequelize,Sequelize),
 };
 
 /**

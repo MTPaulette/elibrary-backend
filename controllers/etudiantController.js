@@ -6,41 +6,41 @@ const key = require("../models/index").key;
 const { Op } = require("sequelize");
 
 
-//find all user from the database
+//find all etudiant from the database
 exports.findAll = (req, res) => {
 
 };
 
-//find a single user with an id
+//find a single etudiant with an id
 exports.findOne = (req, res) => {
     
 };
 
 
-//update user by the id in the request
+//update etudiant by the id in the request
 exports.update = (req, res) => {
 
 };
 
-//delete user with specific id
+//delete etudiant with specific id
 exports.delete = (req, res) => {
 
 };
 
-//delete all the user
+//delete all the etudiant
 exports.deleteAll = (req, res) => {
 
 };
 
-//find all published users
+//find all published etudiants
 exports.findAllPublished = (req, res) => {
 
 };
 
-//create and save a new user during user registration
+//create and save a new etudiant during etudiant registration
 exports.create = async (req, res) => {
     
-    let { login, email,password, confirm_password } = req.body
+    let { login, email,password, confirm_password, faculte, filiere, niveau, specialite } = req.body
 
     //check the confirm password
     if(password !== confirm_password){
@@ -50,37 +50,41 @@ exports.create = async (req, res) => {
     }
     
     //check for the unique login
-    const userWithLogin = await Etudiant.findOne ({
+    const etudiantWithLogin = await Etudiant.findOne ({
         where: {
             login: login
         }
-    })//.then(user => {
-    if(userWithLogin) {
+    })//.then(etudiant => {
+    if(etudiantWithLogin) {
         return res.status(400).json({
             msg: "this login is already taken",
-            user: userWithLogin
+            etudiant: etudiantWithLogin
         });
     }
     //});
 
     //check for the unique email
-    const userWithEmail = await Etudiant.findOne ({
+    const etudiantWithEmail = await Etudiant.findOne ({
         where: {
             email: email
         }
     })
-    if(userWithEmail) {
+    if(etudiantWithEmail) {
         return res.status(400).json({
             msg: "this email is already registred. Did you forgot your password?",
-            user: userWithEmail
+            etudiant: etudiantWithEmail
         });
     }
 
-    //the data is valid and now we can register the user
+    //the data is valid and now we can register the etudiant
     let newEtudiant = new Etudiant({
         login,
         email,
-        password
+        password,
+        faculte,
+        filiere,
+        niveau,
+        specialite 
     });
     
     //hash the password
@@ -88,28 +92,28 @@ exports.create = async (req, res) => {
         bcrypt.hash(newEtudiant.password, salt, (err, hash) => {
             if(err) throw errow;
             newEtudiant.password = hash;
-            newEtudiant.save().then(user => {
+            newEtudiant.save().then(etudiant => {
                 return res.status(201).json({
                     success: true,
-                    msg: "user registred successfully",
-                    user: user
+                    msg: "etudiant registred successfully",
+                    etudiant: etudiant
                 });
             });
         });
     });
 };
 
-//user login
+//etudiant login
 exports.login = async (req, res, next) => {
 
     let { login, email,password } = req.body;
-    const user = await Etudiant.findOne ({
+    const etudiant = await Etudiant.findOne ({
         where: {
             email: email
         }
     })
 
-    if(!user) {
+    if(!etudiant) {
         return res.status(204).json({
             msg: "Email pas trouvé",
             success: false,
@@ -118,14 +122,14 @@ exports.login = async (req, res, next) => {
         });
     }
     
-    //if there is user we are now going to compare the password
-    bcrypt.compare(password, user.password).then(isMatch => {
+    //if there is etudiant we are now going to compare the password
+    bcrypt.compare(password, etudiant.password).then(isMatch => {
         if(isMatch) {
             const jwt_payload = {
-                _id: user.id,
-                login: user.login,
-                email: user.email,
-                password: user.password
+                _id: etudiant.id,
+                login: etudiant.login,
+                email: etudiant.email,
+                password: etudiant.password
             }
             jwt.sign(jwt_payload, key, {
                 expiresIn: 604800
@@ -133,7 +137,7 @@ exports.login = async (req, res, next) => {
                 return res.status(200).json({
                     success: true,
                     token: 'Bearer '+ token,
-                    user: user,
+                    etudiant: etudiant,
                     msg: "Bingo!!! vous êtes connectés",
                     password: true,
                     email: true
@@ -163,8 +167,8 @@ opts.secretOrKey = key;
 
 console.log(jwt_payload);
     const strategy = new JwtStrategy(opts, (jwt_payload, done) => {
-            Etudiant.findById(jwt_payload._id).then(user => {
-                if(user) return done(null, user);
+            Etudiant.findById(jwt_payload._id).then(etudiant => {
+                if(etudiant) return done(null, etudiant);
                 return done(null, false);
             }).catch(err => {
                 console.log(err)

@@ -33,7 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 
 //bring in passport strategy
-require('./config/passport');
+require('./middleware/passport');
 
 //connection to a database
 const db = require("./models");
@@ -44,6 +44,10 @@ const db = require("./models");
 //bring in the Users route
 const users = require('./routes/api/users');
 app.use('/api/users', users)
+
+//bring in the admin route
+const admins = require('./routes/api/admins');
+app.use('/api/admins', admins)
 
 //start server
 const port = process.env.PORT || 5000;
