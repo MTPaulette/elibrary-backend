@@ -49,6 +49,18 @@ app.use('/api/users', users)
 const admins = require('./routes/api/admins');
 app.use('/api/admins', admins)
 
+//bring in the faculte route
+const facultes = require('./routes/api/facultes');
+app.use('/api/facultes', facultes)
+
+//bring in the filiere route
+const filieres = require('./routes/api/filieres');
+app.use('/api/filieres', filieres)
+
+//bring in the niveau route
+const niveaux = require('./routes/api/niveaux');
+app.use('/api/niveaux', niveaux)
+
 //start server
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log('server started on port '+ port));

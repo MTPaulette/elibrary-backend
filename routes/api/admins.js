@@ -27,7 +27,7 @@ router.post('/login',(req,res) => {AdminController.login(req,res)});
 router.post('/nouveau', passport.authenticate('jwt', { session: false }), (req, res) => {
     const role = req.user.role;
     if (role == 'admin') {
-        AdminController.nouveau(req,res);
+        AdminController.ajouterEnseignant(req,res);
     } else {
         return res.json({
             admin: req.user,
@@ -37,13 +37,37 @@ router.post('/nouveau', passport.authenticate('jwt', { session: false }), (req, 
 });
 
 /**
- * @route POST api/admins/nouveau_enseignant
+ * @route POST api/admins/ajouterEnseignant
  * @desc ajouterEnseignant par un admin
  * @access Public
  */
- router.post('/nouveau_enseignant',(req,res) => {AdminController.nouveau(req,res)});
+ router.post('/ajouterEnseignant',(req,res) => {AdminController.ajouterEnseignant(req,res)});
+
+ /**
+  * @route POST api/admins/bloquerEnseignant
+  * @desc bloquer un Enseignant par un admin
+  * @access Public
+  */
+ router.post('/bloquerEnseignant',(req,res) => {AdminController.bloquerEnseignant(req,res)});
+
+/**
+ * @route POST api/admins/debloquerEnseignant
+ * @desc debloquer un Enseignant par un admin
+ * @access Public
+ */
+ router.post('/debloquerEnseignant',(req,res) => {AdminController.debloquerEnseignant(req,res)});
+
+/**
+ * @route POST api/admins/supprimerEnseignant
+ * @desc supprimer un Enseignant par un admin
+ * @access Public
+ */
+ router.post('/supprimerEnseignant',(req,res) => {AdminController.supprimerEnseignant(req,res)});
 
 
- router.post('/check',checkAuth, (req,res) => {AdminController.nouveau(req,res)});
+ router.post('/check', passport.authenticate('jwt', { session: false }) ,(req,res) => {AdminController.check(req,res)});
+
+ //router.post('/check',checkAuth, (req,res) => {AdminController.check(req,res)});
+ //router.post('/check',checkAuth, (req,res) => {AdminController.nouveau(req,res)});
 
 module.exports = router;

@@ -1,5 +1,6 @@
 const Admin = require("../models/index").Admin;
 const bcrypt = require('bcryptjs');
+const e = require("express");
 const jwt = require('jsonwebtoken');
 const key = require("../models/index").key;
 
@@ -86,7 +87,7 @@ exports.create = async (req, res) => {
 };
 
 //admin login
-exports.login = async (req, res, next) => {
+exports.login = async (req, res) => {
 
     let { email,password } = req.body;
     const admin = await Admin.findOne ({
@@ -132,66 +133,22 @@ exports.login = async (req, res, next) => {
                 password: false
             });
         }
-        next();
     });
 };
 
 
 //ajouter un nouvel enseignant
-exports.nouveau = async (req, res) => {
-    /*
-
-    
-    let { email,password, confirm_password } = req.body
-
-    //check the confirm password
-    if(password !== confirm_password){
-        return res.status(400).json({
-            msg: "password do not match."
-        });
-    }
-
-    //check for the unique email
-    const adminWithEmail = await Admin.findOne ({
-        where: {
-            email: email
-        }
-    })
-    if(adminWithEmail) {
-        return res.status(400).json({
-            msg: "this email is already registred. Did you forgot your password?",
-            admin: adminWithEmail
-        });
-    }
-
-    //the data is valid and now we can register the admin
-    let newAdmin = new Admin({
-        email,
-        password
-    });
-    
-    //hash the password
-    bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(newAdmin.password, salt, (err, hash) => {
-            if(err) throw errow;
-            newAdmin.password = hash;
-            newAdmin.save().then(admin => {
-                return res.status(201).json({
-                    success: true,
-                    msg: "admin registred successfully",
-                    admin: admin
-                });
-            });
-        });
-    });
-    */
+exports.ajouterEnseignant = async (req, res) => {
     
     let { nom, email, password, confirm_password } = req.body
-
     //check the confirm password
     if(password !== confirm_password){
         return res.status(400).json({
-            msg: "password do not match."
+            msg: "password do not match.",
+            password,
+            confirm_password,
+            nom,
+            email
         });
     }
 
@@ -219,18 +176,161 @@ exports.nouveau = async (req, res) => {
     //hash the password
     bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newEnseignant.password, salt, (err, hash) => {
-            if(err) throw errow;
+            if(err) throw err;
             newEnseignant.password = hash;
             Enseignant.create(newEnseignant).then(enseignant => {
-               // newEnseignant.save().then(enseignant => {
-                enseignant.createAdmin(this);
+                enseignant.setAdmin(req.user.instance);
                 return res.status(201).json({
                     success: true,
                     msg: "enseignant registred successfully",
+                    admin: req.user,
                     enseignant: enseignant
                 });
             });
         });
     });
+
+};
+
+
+//blouer un nouvel enseignant
+exports.bloquerEnseignant = async (req, res) => {
+    
+    let { nom, email, password, confirm_password } = req.body
+
+    //check for the unique email
+    const enseignantWithEmail = await Enseignant.findOne ({
+        where: {
+            email: email
+        }
+    })
+    if(!enseignantWithEmail) {
+        return res.status(400).json({
+            msg: "email pas trouvé",
+        });
+    }
+    //enseignantWithEmail.etat = 'bloqué'
+    enseignantWithEmail.update({etat: "bloqué"}).then(enseignant => {
+        return res.status(201).json({
+            success: true,
+            msg: "enseignant bloue successfully",
+            enseignant_bloqué: enseignant
+        });
+    });
+};
+
+
+//deblouer un nouvel enseignant
+exports.debloquerEnseignant = async (req, res) => {
+    
+    let { nom, email, password, confirm_password } = req.body
+
+    //check for the unique email
+    const enseignantWithEmail = await Enseignant.findOne ({
+        where: {
+            email: email
+        }
+    })
+    if(!enseignantWithEmail) {
+        return res.status(400).json({
+            msg: "email pas trouvé",
+        });
+    }
+    //enseignantWithEmail.etat = 'bloqué'
+    enseignantWithEmail.update({etat: "actif"}).then(enseignant => {
+        return res.status(201).json({
+            success: true,
+            msg: "enseignant debloue avec success",
+            enseignant_bloqué: enseignant
+        });
+    });
+};
+
+//supprime un nouvel enseignant
+exports.supprimerEnseignant = async (req, res) => {
+    
+    let { nom, email, password, confirm_password } = req.body
+
+    //check for the unique email
+    const enseignantWithEmail = await Enseignant.findOne ({
+        where: {
+            email: email
+        }
+    })
+    if(!enseignantWithEmail) {
+        return res.status(400).json({
+            msg: "email pas trouvé",
+        });
+    }
+    //enseignantWithEmail.etat = 'bloqué'
+    enseignantWithEmail.update({etat: "supprimé"}).then(enseignant => {
+        return res.status(201).json({
+            success: true,
+            msg: "enseignant supprimé avec success",
+            enseignant_bloqué: enseignant
+        });
+    });
+};
+
+//supprime un nouvel enseignant
+exports.check = async (req, res) => {
+    
+    let { nom, email, password, confirm_password } = req.body
+    //check the confirm password
+    if(password !== confirm_password){
+        return res.status(400).json({
+            msg: "password do not match.",
+            password,
+            confirm_password,
+            nom,
+            email
+        });
+    }
+
+    //check for the unique email
+    const enseignantWithEmail = await Enseignant.findOne ({
+        where: {
+            email: email
+        }
+    })
+    if(enseignantWithEmail) {
+        return res.status(400).json({
+            msg: "this email is already registred. Did you forgot your password?",
+            admin: enseignantWithEmail
+        });
+    }
+
+    //the data is valid and now we can register the admin
+    let newEnseignant= {
+        //let newEnseignant= new Enseignant({
+        nom,
+        email,
+        password
+    };
+    
+
+    return res.status(201).json({
+        success: true,
+        msg: "enseignant registred successfully",
+        admin: req.user.instance
+    });
+    /*
+    //hash the password
+    bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(newEnseignant.password, salt, (err, hash) => {
+            if(err) throw err;
+            newEnseignant.password = hash;
+            Enseignant.create(newEnseignant).then(enseignant => {
+                enseignant.setAdmin(req.user.instance);
+                return res.status(201).json({
+                    success: true,
+                    msg: "enseignant registred successfully",
+                    admin: req.user,
+                    enseignant: enseignant
+                });
+            });
+        });
+    });
+    */
 
 };
