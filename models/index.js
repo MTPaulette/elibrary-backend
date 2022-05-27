@@ -54,6 +54,11 @@ const myModels = {
     Td : require('./Td')(sequelize,Sequelize),
     Ue : require('./Ue')(sequelize,Sequelize),
     User : require('./User')(sequelize,Sequelize),
+
+
+    Role : require('./Role')(sequelize,Sequelize),
+    Permission : require('./Permission')(sequelize,Sequelize),
+    PermissionRole : require('./PermissionRole')(sequelize,Sequelize),
 };
 
 /**
@@ -69,7 +74,7 @@ myModels.Admin.hasMany(myModels.Domaine, { foreignKey: {name:'idAdminAjouteur'}}
 myModels.Domaine.belongsTo(myModels.Admin);
 
 //admin bloque un ou n etudiant
-myModels.Admin.hasMany(myModels.Etudiant, { foreignKey: {name:'idAdminBloqueur'}});
+myModels.Admin.hasMany(myModels.Etudiant, { foreignKey: {name:'AdminBloqueurId'}});
 myModels.Etudiant.belongsTo(myModels.Admin);
 
 //admin envoye et recevoir un ou n notification
@@ -243,6 +248,18 @@ myModels.Niveau.belongsToMany(myModels.Filiere, {through: 'filiereNiveau'});
 myModels.Specialite.belongsToMany(myModels.Niveau, {through: 'filiereNiveau'});
 myModels.Niveau.belongsToMany(myModels.Specialite, {through: 'filiereNiveau'});
 
+/***
+ * role a un ou n user
+ * permission a n ou n role
+ */
+
+//role a un ou n user
+myModels.Role.hasMany(myModels.User);
+myModels.User.belongsTo(myModels.Role);
+
+//role a n ou n permission
+myModels.Role.belongsToMany(myModels.Permission, {through: 'permissionRole'});
+myModels.Permission.belongsToMany(myModels.Role, {through: 'permissionRole'});
 
 //myModels.User.belongsToMany(myModels.Document, {through: 'C'});
 //myModels.Document.belongsToMany(myModels.User, {through: 'C'});
