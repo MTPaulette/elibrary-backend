@@ -1,45 +1,11 @@
 const { User } = require("../models/index");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const passport = require('passport');
-const passportjS = require('../middleware/passport').passport;
 const key = require("../models/index").key;
 
 const { Op } = require("sequelize");
-
-
-//find all user from the database
-exports.findAll = (req, res) => {
-
-};
-
-//find a single user with an id
-exports.findOne = (req, res) => {
-    
-};
-
-
-//update user by the id in the request
-exports.update = (req, res) => {
-
-};
-//delete user with specific id
-exports.delete = (req, res) => {
-
-};
-
-//delete all the user
-exports.deleteAll = (req, res) => {
-
-};
-
-//find all published users
-exports.findAllPublished = (req, res) => {
-
-};
-
 /**
- * =========================================================== administrer les users ======================================================
+ * =========================================================== gestion des utilisateurs ======================================================
  */
 //user login
 exports.login = async (req, res) => {
@@ -221,11 +187,106 @@ exports.supprimerUser = async (req, res) => {
         });
     });
 };
-/**================================================================================================================================================ */
 
 /**
- * =========================================================== administrer les users ===========================================================
+ * =========================================================== gestion de la recherche des utilisateurs===========================================================
  */
+//find all user from the database
+exports.findAllUser = async (req, res) => {
+    //check for the unique id
+    /*
+    const allUser = await User.findAll({
+        attributes: {
+            include: [
+                [sequelize.fn('COUNT', sequelize.col('email')), 'n']
+            ]
+        }
+    });*/
+    let allUser = {}
+    if (!req.RoleId) {
+        allUser = await User.findAll();
+    } else {
+        allUser = await User.findAll({
+            where: {
+                RoleId: req.RoleId
+            }
+        }); 
+    }
+    if (allUser) {
+        return res.status(201).json({
+            success: true,
+            allUser: allUser
+        });
+    } else {
+        return res.status(500).json({
+            success: false
+        });
+    }
+};
 
+//recherche de tous les enseigants bloqués
+exports.findAllUserState = async (req, res) => {
+    //check for the unique id
+    const allUser = await User.findAll({
+        where: {
+            RoleId: req.RoleId,
+            etat: req.etat
+        }
+    });
+    if (allUser) {
+        return res.status(201).json({
+            success: true,
+            allUser: allUser
+        });
+    } else {
+        return res.status(500).json({
+            success: false
+        });
+    }
+};
+
+//recherche de tous les enseigants bloqués
+exports.findOneUser = async (req, res) => {
+    //check for the unique id
+    const allUser = await User.findAll({
+        where: {
+            nom: {
+                [Op.substring]: req.params.nom,
+            },
+            RoleId: req.RoleId,
+            etat: req.etat
+        }
+    });
+    if (allUser) {
+        return res.status(201).json({
+            success: true,
+            allUser: allUser
+        });
+    } else {
+        return res.status(500).json({
+            success: false
+        });
+    }
+};
+
+
+//update user by the id in the request
+exports.update = (req, res) => {
+
+};
+//delete user with specific id
+exports.delete = (req, res) => {
+
+};
+
+//delete all the user
+exports.deleteAll = (req, res) => {
+
+};
+
+//find all published users
+exports.findAllPublished = (req, res) => {
+
+};
 
 /**================================================================================================================================================ */
