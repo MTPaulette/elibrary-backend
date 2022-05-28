@@ -257,9 +257,12 @@ myModels.Niveau.belongsToMany(myModels.Specialite, {through: 'filiereNiveau'});
 myModels.Role.hasMany(myModels.User);
 myModels.User.belongsTo(myModels.Role);
 
+myModels.Admin.hasMany(myModels.User);
+myModels.User.belongsTo(myModels.Admin);
+
 //role a n ou n permission
-myModels.Role.belongsToMany(myModels.Permission, {through: 'permissionRole'});
-myModels.Permission.belongsToMany(myModels.Role, {through: 'permissionRole'});
+myModels.Role.belongsToMany(myModels.Permission, {through: 'PermissionRole'});
+myModels.Permission.belongsToMany(myModels.Role, {through: 'PermissionRole'});
 
 //myModels.User.belongsToMany(myModels.Document, {through: 'C'});
 //myModels.Document.belongsToMany(myModels.User, {through: 'C'});

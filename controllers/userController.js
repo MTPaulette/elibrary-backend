@@ -1,4 +1,4 @@
-const User = require("../models/index").User;
+const { User } = require("../models/index");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
@@ -23,7 +23,6 @@ exports.findOne = (req, res) => {
 exports.update = (req, res) => {
 
 };
-
 //delete user with specific id
 exports.delete = (req, res) => {
 
@@ -40,30 +39,15 @@ exports.findAllPublished = (req, res) => {
 };
 
 //create and save a new user during user registration
-exports.create = async (req, res) => {
+exports.registerAdmin = async (req, res) => {
     
-    let { login, email,password, confirm_password } = req.body
-
+    let { email,password, confirm_password, role } = req.body
     //check the confirm password
     if(password !== confirm_password){
         return res.status(400).json({
             msg: "password do not match."
         });
     }
-    
-    //check for the unique login
-    const userWithLogin = await User.findOne ({
-        where: {
-            login: login
-        }
-    })//.then(user => {
-    if(userWithLogin) {
-        return res.status(400).json({
-            msg: "this login is already taken",
-            user: userWithLogin
-        });
-    }
-    //});
 
     //check for the unique email
     const userWithEmail = await User.findOne ({
@@ -79,18 +63,20 @@ exports.create = async (req, res) => {
     }
 
     //the data is valid and now we can register the user
-    let newUser = new User({
-        login,
+    let newUser = {
+        nom: 'admin',
         email,
         password
-    });
-    
+    };
+
     //hash the password
     bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {
             if(err) throw errow;
             newUser.password = hash;
-            newUser.save().then(user => {
+
+            User.create(newUser).then(user => {
+                user.setRole(1);
                 return res.status(201).json({
                     success: true,
                     msg: "user registred successfully",
@@ -102,7 +88,7 @@ exports.create = async (req, res) => {
 };
 
 //user login
-exports.login = async (req, res, next) => {
+exports.login = async (req, res) => {
 
     let { email,password } = req.body;
     const user = await User.findOne ({
@@ -112,7 +98,7 @@ exports.login = async (req, res, next) => {
     })
 
     if(!user) {
-        return res.status(204).json({
+        return res.status(400).json({
             msg: "Email pas trouvé",
             success: false,
             email: false,
@@ -127,6 +113,7 @@ exports.login = async (req, res, next) => {
                 _id: user.id,
                 email: user.email,
                 password: user.password,
+                role: user.RoleId
                 //role: 'utilisateur'
             }
             jwt.sign(jwt_payload, key, {
@@ -142,37 +129,201 @@ exports.login = async (req, res, next) => {
                 });
             })
         }else {
-            return res.status(204).json({
+            return res.status(400).json({
                 msg: "mot de passe incorrect",
                 success: false,
                 password: false
             });
         }
     });
-
-
-/*
-const JwtStrategy = require('passport-jwt').Strategy;
-const ExtractJwt = require('passport-jwt').ExtractJwt;
-const Model = require('../../models/index');
-const User = Model.User;
-const key = Model.key;
-
-/*
-const opts = {};
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = key;
-
-console.log(jwt_payload);
-    const strategy = new JwtStrategy(opts, (jwt_payload, done) => {
-            User.findById(jwt_payload._id).then(user => {
-                if(user) return done(null, user);
-                return done(null, false);
-            }).catch(err => {
-                console.log(err)
-            });
-        })
-    
-passport.use(strategy);
-*/
 };
+
+
+/**
+ * =========================================================== administrer les enseignants ======================================================
+ */
+
+//ajouter un nouvel enseignant
+exports.register = async (req, res) => {
+    
+    let { nom, email, password, confirm_password } = req.body
+    //check the confirm password
+    if(password !== confirm_password){
+        return res.status(400).json({
+            msg: "password do not match."
+        });
+    }
+
+    //check for the unique email
+    const enseignantWithEmail = await User.findOne ({
+        where: {
+            email: email
+        }
+    })
+    if(enseignantWithEmail) {
+        return res.status(400).json({
+            msg: "this email is already registred. Did you forgot your password?",
+            admin: enseignantWithEmail
+        });
+    }
+
+    //the data is valid and now we can register the admin
+    let newEnseignant= {
+        //let newEnseignant= new Enseignant({
+        nom,
+        email,
+        password
+    };
+    
+    //hash the password
+    bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(newEnseignant.password, salt, (err, hash) => {
+            if(err) throw err;
+            newEnseignant.password = hash;
+            User.create(newEnseignant).then(enseignant => {
+                if(!req.user) {
+                    enseignant.setRole(3);
+                }else {
+                    if(req.user.RoleId == 1) {
+                        enseignant.setAdmin(1);
+                        enseignant.setRole(2);
+                    }
+                }
+                return res.status(201).json({
+                    success: true,
+                    msg: "enseignant registred successfully",
+                    enseignant: enseignant
+                });
+            });
+        });
+    });
+
+};
+
+//blouer un nouvel enseignant
+exports.bloquerEnseignant = async (req, res) => {
+
+    //check for the unique id
+    const enseignantWithId = await User.findOne({
+        where: {
+            id: req.params.id
+        }
+    })
+    if(!enseignantWithId) {
+        return res.status(400).json({
+            success: false,
+            msg: "email pas trouvé",
+        });
+    }
+    enseignantWithId.update({etat: "bloqué"}).then(enseignant => {
+        return res.status(201).json({
+            success: true,
+            msg: "enseignant bloqué avec success",
+            enseignant_bloqué: enseignant
+        });
+    });
+};
+
+//deblouer un nouvel enseignant
+exports.debloquerEnseignant = async (req, res) => {
+    //check for the unique id
+    const enseignantWithId = await User.findOne({
+        where: {
+            id: req.params.id
+        }
+    })
+    if(!enseignantWithId) {
+        return res.status(400).json({
+            success: false,
+            msg: "email pas trouvé",
+        });
+    }
+    enseignantWithId.update({etat: "actif"}).then(enseignant => {
+        return res.status(201).json({
+            success: true,
+            msg: "enseignant debloque",
+            enseignant_debloqué: enseignant
+        });
+    });
+};
+
+//supprime un nouvel enseignant
+exports.supprimerEnseignant = async (req, res) => {
+
+    //check for the unique id
+    const enseignantWithId = await User.findOne({
+        where: {
+            id: req.params.id
+        }
+    })
+    if(!enseignantWithId) {
+        return res.status(400).json({
+            success: false,
+            msg: "email pas trouvé",
+        });
+    }
+    enseignantWithId.update({etat: "supprimé"}).then(enseignant => {
+        return res.status(201).json({
+            success: true,
+            msg: "enseignant supprimé avec success",
+            enseignant_bloqué: enseignant
+        });
+    });
+};
+/**================================================================================================================================================ */
+
+/**
+ * =========================================================== administrer les etudiants ===========================================================
+ */
+
+//blouer un nouvel etudiant
+exports.bloquerEtudiant = async (req, res) => {
+
+    //check for the unique id
+    const etudiantWithId = await Etudiant.findOne({
+        where: {
+            id: req.params.id
+        }
+    })
+    if(!etudiantWithId) {
+        return res.status(400).json({
+            success: false,
+            msg: "email pas trouvé",
+        });
+    }
+    etudiantWithId.update({etat: "bloqué"}).then(etudiant => {
+        etudiant.setAdmin(req.user.RoleId);
+        //etudiant.setAdminBloqueur(req.user.instance);
+        return res.status(201).json({
+            success: true,
+            msg: "etudiant bloqué avec success",
+            etudiant_bloqué: etudiant
+        });
+    });
+};
+
+//deblouer un nouvel etudiant
+exports.debloquerEtudiant = async (req, res) => {
+    //check for the unique id
+    const etudiantWithId = await Etudiant.findOne({
+        where: {
+            id: req.params.id
+        }
+    })
+    if(!etudiantWithId) {
+        return res.status(400).json({
+            success: false,
+            msg: "email pas trouvé",
+        });
+    }
+    etudiantWithId.update({etat: "actif"}).then(etudiant => {
+        etudiant.setAdmin(req.user.RoleId);
+        return res.status(201).json({
+            success: true,
+            msg: "etudiant debloue",
+            etudiant_bloqué: etudiant
+        });
+    });
+};
+
+/**================================================================================================================================================ */

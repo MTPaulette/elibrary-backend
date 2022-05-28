@@ -5,8 +5,8 @@ module.exports = (sequelize,Sequelize) => {
             autoIncrement: true,
             primaryKey: true
         },
-        login: {
-            type: Sequelize.STRING,
+        nom: {
+            type: Sequelize.TEXT,
             allowNull: false
         },
         email: {
@@ -17,6 +17,11 @@ module.exports = (sequelize,Sequelize) => {
         password: {
             type: Sequelize.STRING,
             allowNull: false
+        },
+        etat: {
+            type: Sequelize.STRING,
+            allowNull: false,
+            defaultValue: 'actif'
         }
     },
     {
