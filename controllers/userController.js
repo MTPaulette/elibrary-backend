@@ -38,55 +38,9 @@ exports.findAllPublished = (req, res) => {
 
 };
 
-//create and save a new user during user registration
-exports.registerAdmin = async (req, res) => {
-    
-    let { email,password, confirm_password, role } = req.body
-    //check the confirm password
-    if(password !== confirm_password){
-        return res.status(400).json({
-            msg: "password do not match."
-        });
-    }
-
-    //check for the unique email
-    const userWithEmail = await User.findOne ({
-        where: {
-            email: email
-        }
-    })
-    if(userWithEmail) {
-        return res.status(400).json({
-            msg: "this email is already registred. Did you forgot your password?",
-            user: userWithEmail
-        });
-    }
-
-    //the data is valid and now we can register the user
-    let newUser = {
-        nom: 'admin',
-        email,
-        password
-    };
-
-    //hash the password
-    bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(newUser.password, salt, (err, hash) => {
-            if(err) throw errow;
-            newUser.password = hash;
-
-            User.create(newUser).then(user => {
-                user.setRole(1);
-                return res.status(201).json({
-                    success: true,
-                    msg: "user registred successfully",
-                    user: user
-                });
-            });
-        });
-    });
-};
-
+/**
+ * =========================================================== administrer les users ======================================================
+ */
 //user login
 exports.login = async (req, res) => {
 
@@ -138,12 +92,7 @@ exports.login = async (req, res) => {
     });
 };
 
-
-/**
- * =========================================================== administrer les enseignants ======================================================
- */
-
-//ajouter un nouvel enseignant
+//ajouter un nouvel user
 exports.register = async (req, res) => {
     
     let { nom, email, password, confirm_password } = req.body
@@ -155,21 +104,21 @@ exports.register = async (req, res) => {
     }
 
     //check for the unique email
-    const enseignantWithEmail = await User.findOne ({
+    const userWithEmail = await User.findOne ({
         where: {
             email: email
         }
     })
-    if(enseignantWithEmail) {
+    if(userWithEmail) {
         return res.status(400).json({
             msg: "this email is already registred. Did you forgot your password?",
-            admin: enseignantWithEmail
+            user: userWithEmail
         });
     }
 
     //the data is valid and now we can register the admin
-    let newEnseignant= {
-        //let newEnseignant= new Enseignant({
+    let newUser= {
+        //let newUser= new User({
         nom,
         email,
         password
@@ -177,22 +126,22 @@ exports.register = async (req, res) => {
     
     //hash the password
     bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(newEnseignant.password, salt, (err, hash) => {
+        bcrypt.hash(newUser.password, salt, (err, hash) => {
             if(err) throw err;
-            newEnseignant.password = hash;
-            User.create(newEnseignant).then(enseignant => {
+            newUser.password = hash;
+            User.create(newUser).then(user => {
                 if(!req.user) {
-                    enseignant.setRole(3);
+                    user.setRole(3);
                 }else {
                     if(req.user.RoleId == 1) {
-                        enseignant.setAdmin(1);
-                        enseignant.setRole(2);
+                        user.setAdmin(1);
+                        user.setRole(2);
                     }
                 }
                 return res.status(201).json({
                     success: true,
-                    msg: "enseignant registred successfully",
-                    enseignant: enseignant
+                    msg: "user registred successfully",
+                    user: user
                 });
             });
         });
@@ -200,130 +149,83 @@ exports.register = async (req, res) => {
 
 };
 
-//blouer un nouvel enseignant
-exports.bloquerEnseignant = async (req, res) => {
+//blouer un nouvel utilisateur
+exports.bloquerUser = async (req, res) => {
 
     //check for the unique id
-    const enseignantWithId = await User.findOne({
+    const userWithId = await User.findOne({
         where: {
             id: req.params.id
         }
     })
-    if(!enseignantWithId) {
+    if(!userWithId) {
         return res.status(400).json({
             success: false,
             msg: "email pas trouvé",
         });
     }
-    enseignantWithId.update({etat: "bloqué"}).then(enseignant => {
+    userWithId.update({etat: "bloqué"}).then(user => {
+        user.setAdmin(req.user.RoleId);
+        //user.setAdminBloqueur(req.user.instance);
         return res.status(201).json({
             success: true,
-            msg: "enseignant bloqué avec success",
-            enseignant_bloqué: enseignant
+            msg: "user bloqué avec success",
+            user_bloqué: user
         });
     });
 };
 
-//deblouer un nouvel enseignant
-exports.debloquerEnseignant = async (req, res) => {
+//deblouer un nouvel user
+exports.debloquerUser = async (req, res) => {
     //check for the unique id
-    const enseignantWithId = await User.findOne({
+    const userWithId = await User.findOne({
         where: {
             id: req.params.id
         }
     })
-    if(!enseignantWithId) {
+    if(!userWithId) {
         return res.status(400).json({
             success: false,
             msg: "email pas trouvé",
         });
     }
-    enseignantWithId.update({etat: "actif"}).then(enseignant => {
+    userWithId.update({etat: "actif"}).then(user => {
         return res.status(201).json({
             success: true,
-            msg: "enseignant debloque",
-            enseignant_debloqué: enseignant
+            msg: "user debloque",
+            user_debloqué: user
         });
     });
 };
 
-//supprime un nouvel enseignant
-exports.supprimerEnseignant = async (req, res) => {
+//supprime un nouvel user
+exports.supprimerUser = async (req, res) => {
 
     //check for the unique id
-    const enseignantWithId = await User.findOne({
+    const userWithId = await User.findOne({
         where: {
             id: req.params.id
         }
     })
-    if(!enseignantWithId) {
+    if(!userWithId) {
         return res.status(400).json({
             success: false,
             msg: "email pas trouvé",
         });
     }
-    enseignantWithId.update({etat: "supprimé"}).then(enseignant => {
+    userWithId.update({etat: "supprimé"}).then(user => {
         return res.status(201).json({
             success: true,
-            msg: "enseignant supprimé avec success",
-            enseignant_bloqué: enseignant
+            msg: "user supprimé avec success",
+            user_bloqué: user
         });
     });
 };
 /**================================================================================================================================================ */
 
 /**
- * =========================================================== administrer les etudiants ===========================================================
+ * =========================================================== administrer les users ===========================================================
  */
 
-//blouer un nouvel etudiant
-exports.bloquerEtudiant = async (req, res) => {
-
-    //check for the unique id
-    const etudiantWithId = await Etudiant.findOne({
-        where: {
-            id: req.params.id
-        }
-    })
-    if(!etudiantWithId) {
-        return res.status(400).json({
-            success: false,
-            msg: "email pas trouvé",
-        });
-    }
-    etudiantWithId.update({etat: "bloqué"}).then(etudiant => {
-        etudiant.setAdmin(req.user.RoleId);
-        //etudiant.setAdminBloqueur(req.user.instance);
-        return res.status(201).json({
-            success: true,
-            msg: "etudiant bloqué avec success",
-            etudiant_bloqué: etudiant
-        });
-    });
-};
-
-//deblouer un nouvel etudiant
-exports.debloquerEtudiant = async (req, res) => {
-    //check for the unique id
-    const etudiantWithId = await Etudiant.findOne({
-        where: {
-            id: req.params.id
-        }
-    })
-    if(!etudiantWithId) {
-        return res.status(400).json({
-            success: false,
-            msg: "email pas trouvé",
-        });
-    }
-    etudiantWithId.update({etat: "actif"}).then(etudiant => {
-        etudiant.setAdmin(req.user.RoleId);
-        return res.status(201).json({
-            success: true,
-            msg: "etudiant debloue",
-            etudiant_bloqué: etudiant
-        });
-    });
-};
 
 /**================================================================================================================================================ */
