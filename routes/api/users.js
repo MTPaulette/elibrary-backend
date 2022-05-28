@@ -21,7 +21,7 @@ router.post('/register',(req,res) => {UserController.register(req,res)});
     try {
         helper.checkPermission(req.user.RoleId, 'crud_enseignant').then(rolePerm => {
             if(rolePerm){
-                UserController.register(req,res)
+                UserController.registerEnseignant(req,res)
             }else{
                 return res.json({
                     success: false,

@@ -61,7 +61,64 @@ exports.login = async (req, res) => {
 //ajouter un nouvel user
 exports.register = async (req, res) => {
     
-    let { nom, email, password, confirm_password } = req.body
+    let { nom, email, password, confirm_password, FaculteId, FiliereId, NiveauId, SpecialiteId} = req.body
+    //check the confirm password
+    if(password !== confirm_password){
+        return res.status(400).json({
+            msg: "password do not match."
+        });
+    }
+
+    //check for the unique email
+    const userWithEmail = await User.findOne ({
+        where: {
+            email: email
+        }
+    })
+    if(userWithEmail) {
+        return res.status(400).json({
+            msg: "this email is already registred. Did you forgot your password?",
+            user: userWithEmail
+        });
+    }
+
+    //the data is valid and now we can register the admin
+    let newUser= {
+        //let newUser= new User({
+        nom,
+        email,
+        password,
+        FaculteId,
+        FiliereId,
+        NiveauId
+    };
+
+    if(SpecialiteId) {
+        newUser.SpecialiteId = SpecialiteId
+    }
+    
+    //hash the password
+    bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(newUser.password, salt, (err, hash) => {
+            if(err) throw err;
+            newUser.password = hash;
+            User.create(newUser).then(user => {
+                user.setRole(3);
+                return res.status(201).json({
+                    success: true,
+                    msg: "user registred successfully",
+                    user: user
+                });
+            });
+        });
+    });
+
+};
+
+//ajouter un nouvel user
+exports.registerEnseignant = async (req, res) => {
+    
+    let { nom, email, password, confirm_password, FaculteId, FiliereId, SpecilaiteId} = req.body
     //check the confirm password
     if(password !== confirm_password){
         return res.status(400).json({

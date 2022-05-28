@@ -37,9 +37,9 @@ require('./middleware/passport');
 
 //connection to a database
 const db = require("./models");
-db.sequelize.sync({ alter: true }).then(() => {
-  console.log("drop and re-sync the database if it contains existing tables");
-})
+//db.sequelize.sync({ alter: true }).then(() => {
+  //console.log("drop and re-sync the database if it contains existing tables");
+//})
 
 //bring in the Users route
 const users = require('./routes/api/users');
@@ -56,6 +56,10 @@ app.use('/api/facultes', facultes)
 //bring in the filiere route
 const filieres = require('./routes/api/filieres');
 app.use('/api/filieres', filieres)
+
+//bring in the specialites route
+const specialites = require('./routes/api/specialites');
+app.use('/api/specialites', specialites)
 
 //bring in the niveau route
 const niveaux = require('./routes/api/niveaux');

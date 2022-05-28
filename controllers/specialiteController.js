@@ -4,18 +4,18 @@ const jwt = require('jsonwebtoken');
 const key = require("../models/index").key;
 
 const Faculte = Model.Faculte;
-const Filiere = Model.Filiere;
+const Specialite = Model.Specialite;
 
 const { Op } = require("sequelize");
 
 
 //find all filiere from the database
 exports.findAll = (req, res) => {
-    Filiere.findAll().then(filieres => {
+    Specialite.findAll().then(specialites => {
         return res.status(201).json({
             success: true,
-            msg: "toutes les filieres",
-            filieres: filieres
+            msg: "toutes les specialites",
+            specialites: specialites
         });
     });
 };
@@ -23,15 +23,15 @@ exports.findAll = (req, res) => {
 
 //find all user from the database
 exports.findByfaculte = async (req, res) => {
-    const allFiliere = await Filiere.findAll({
+    const allSpecialite = await Specialite.findAll({
         where: {
             FaculteId: req.params.faculte
         }
     }); 
-    if (allFiliere) {
+    if (allSpecialite) {
         return res.status(201).json({
             success: true,
-            filieres: allFiliere
+            specialites: allSpecialite
         });
     } else {
         return res.status(500).json({

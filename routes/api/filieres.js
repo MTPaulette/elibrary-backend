@@ -9,4 +9,6 @@ const FiliereController = require('../../controllers/filiereController');
  */
 router.get('/filieres',(req,res) => {FiliereController.findAll(req,res)});
 
+router.get('/filiere/:faculte',(req,res) => {FiliereController.findByfaculte(req,res)});
+
 module.exports = router;

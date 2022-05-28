@@ -14,7 +14,6 @@ exports.findAll = (req, res) => {
         });
     });
 };
-
 //find a single filiere with an id
 exports.findOne = (req, res) => {
     
