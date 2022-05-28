@@ -9,15 +9,32 @@ module.exports = (sequelize,Sequelize) => {
             type: Sequelize.STRING,
             allowNull: false
         },
-        resume: {
+        contenu: {
             type: Sequelize.STRING,
             allowNull: false,
-            unique: true
+        },
+        resume: {
+            type: Sequelize.TEXT,
+            allowNull: true
+        },
+        etat: {
+            type: Sequelize.STRING,
+            allowNull: true,
+            default: 'actif'
+        },
+        nbTelechargement: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+            default: 0,
         },
         auteur: {
             type: Sequelize.STRING,
-            allowNull: false
-        }
+            allowNull: true
+        },
+        photo: {
+            type: Sequelize.STRING,
+            allowNull: true
+        },
     },
     {
         timestamps: true,

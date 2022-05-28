@@ -1,6 +1,6 @@
 /*
 const db = require("../config/connectionDB");
-const Sequelize = require("sequelize");
+const/ Sequelize = require("sequelize");
 
 const connectDB = new Sequelize(db.database, db.user, db.password, {
     host: db.host,
@@ -36,26 +36,29 @@ const sequelize = new Sequelize(db.database, db.user, db.password, {
 const myModels = {
     sequelize : sequelize,
     key : db.key,
-    Admin : require('./Admin')(sequelize,Sequelize),
-    Correction : require('./Correction')(sequelize,Sequelize),
+    /*
+    Admin : require('./old/Admin')(sequelize,Sequelize),
+    Correction : require('./old/Correction')(sequelize,Sequelize),
     Cours : require('./Cours')(sequelize,Sequelize),
-    Domaine : require('./Domaine')(sequelize,Sequelize),
     Enseignant : require('./Enseignant')(sequelize,Sequelize),
     Etudiant : require('./Etudiant')(sequelize,Sequelize),
+    Td : require('./Td')(sequelize,Sequelize),
     Epreuve : require('./Epreuve')(sequelize,Sequelize),
+    Livre : require('./old/Livre')(sequelize,Sequelize),
+    */
+    Document : require('./Document')(sequelize,Sequelize),
+    Domaine : require('./Domaine')(sequelize,Sequelize),
     Faculte : require('./Faculte')(sequelize,Sequelize),
     Filiere : require('./Filiere')(sequelize,Sequelize),
-    Livre : require('./Livre')(sequelize,Sequelize),
     Niveau : require('./Niveau')(sequelize,Sequelize),
     Notification : require('./Notification')(sequelize,Sequelize),
     Requete : require('./Requete')(sequelize,Sequelize),
     Signalement : require('./Requete')(sequelize,Sequelize),
     Specialite : require('./Specialite')(sequelize,Sequelize),
-    Td : require('./Td')(sequelize,Sequelize),
     Ue : require('./Ue')(sequelize,Sequelize),
     User : require('./User')(sequelize,Sequelize),
 
-
+    Type : require('./Type')(sequelize,Sequelize),
     Role : require('./Role')(sequelize,Sequelize),
     Permission : require('./Permission')(sequelize,Sequelize),
     PermissionRole : require('./PermissionRole')(sequelize,Sequelize),
@@ -64,7 +67,7 @@ const myModels = {
 /**
  * module admin
  */
-
+/*
 //admin cree un ou n enseignant
 myModels.Admin.hasMany(myModels.Enseignant);
 myModels.Enseignant.belongsTo(myModels.Admin);
@@ -96,141 +99,83 @@ myModels.Notification.belongsTo(myModels.Admin);
 myModels.Admin.hasMany(myModels.Notification, { foreignKey: 'idAdminBloqueur'});
 myModels.Admin.hasMany(myModels.Notification, { foreignKey: 'idAdminDebloqueur'});
 myModels.Notification.belongsTo(myModels.Admin);
+*/
 
-
-/**
- * module etudiant
- */
-
-//etudiant aime et recevoir n ou n domaine
-myModels.Etudiant.belongsToMany(myModels.Livre, {through: 'domaineEtudiant'});
-myModels.Livre.belongsToMany(myModels.Etudiant, {through: 'domaineEtudiant'});
-
-//etudiant aime n ou n domaine
-myModels.Etudiant.belongsToMany(myModels.Notification, {through: 'etudiantNotification'});
-myModels.Notification.belongsToMany(myModels.Etudiant, {through: 'etudiantNotification'});
-
-//etudiant publie un ou n livre
-myModels.Etudiant.hasMany(myModels.Livre, { foreignKey: {name:'idEtudiantPublieur'}});
-myModels.Livre.belongsTo(myModels.Etudiant);
-
-//etudiant supprime un ou n livre
-myModels.Etudiant.hasMany(myModels.Livre, { foreignKey: {name:'idEtudiantSupprimeur'}});
-myModels.Livre.belongsTo(myModels.Etudiant);
-
-//etudiant envoie un ou n signalement
-myModels.Etudiant.hasMany(myModels.Signalement, { foreignKey: {allowNull: false}});
-myModels.Signalement.belongsTo(myModels.Etudiant);
-
-//etudiant envoie un ou n signalement
-myModels.Etudiant.hasMany(myModels.Signalement, { foreignKey: {allowNull: false}});
-myModels.Signalement.belongsTo(myModels.Etudiant);
-
-//etudiant envoie un ou n requete
-myModels.Etudiant.hasMany(myModels.Requete);
-myModels.Requete.belongsTo(myModels.Etudiant);
-
-
-/**
- * module enseignant
- */
-
-//enseignant ajoute un ou n domaine
-myModels.Enseignant.hasMany(myModels.Domaine, { foreignKey: {name:'idEnseignantAjouteur'}});
-myModels.Domaine.belongsTo(myModels.Enseignant)
-
-//enseignant publie un ou n cours
-myModels.Enseignant.hasMany(myModels.Cours, { foreignKey: {name:'idEnseignantPublieur'}});
-myModels.Cours.belongsTo(myModels.Enseignant)
-
-//enseignant supprimer un ou n cours
-myModels.Enseignant.hasMany(myModels.Cours, { foreignKey: {name:'idEnseignantSupprimeur'}});
-myModels.Cours.belongsTo(myModels.Enseignant)
-
-//enseignant publie un ou n td
-myModels.Enseignant.hasMany(myModels.Td, { foreignKey: {name:'idEnseignantPublieur'}});
-myModels.Td.belongsTo(myModels.Enseignant)
-
-//enseignant supprimer un ou n td
-myModels.Enseignant.hasMany(myModels.Td, { foreignKey: {name:'idEnseignantSupprimeur'}});
-myModels.Td.belongsTo(myModels.Enseignant)
-
-//enseignant publie un ou n epreuve
-myModels.Enseignant.hasMany(myModels.Epreuve, { foreignKey: {name:'idEnseignantPublieur'}});
-myModels.Epreuve.belongsTo(myModels.Enseignant)
-
-//enseignant supprimer un ou n epreuve
-myModels.Enseignant.hasMany(myModels.Epreuve, { foreignKey: {name:'idEnseignantSupprimeur'}});
-myModels.Epreuve.belongsTo(myModels.Enseignant)
-
-//enseignant publie un ou n correction
-myModels.Enseignant.hasMany(myModels.Correction, { foreignKey: {name:'idEnseignantPublieur'}});
-myModels.Correction.belongsTo(myModels.Enseignant)
-
-//enseignant supprimer un ou n Correction
-myModels.Enseignant.hasMany(myModels.Correction, { foreignKey: {name:'idEnseignantSupprimeur'}});
-myModels.Correction.belongsTo(myModels.Enseignant)
-
-//td a un ou n Correction
-myModels.Td.hasMany(myModels.Correction);
-myModels.Correction.belongsTo(myModels.Td)
+/******************************************** user et faculte, filiere, specialite*************************************************** */
 
 //epreuve a un ou n Correction
+/*
 myModels.Epreuve.hasMany(myModels.Correction);
 myModels.Correction.belongsTo(myModels.Epreuve)
-
+*/
 //faculte a un ou n etudiant
-myModels.Faculte.hasMany(myModels.Etudiant);
-myModels.Etudiant.belongsTo(myModels.Faculte);
+myModels.Faculte.hasMany(myModels.User);
+myModels.User.belongsTo(myModels.Faculte);
 
 //Filiere a un ou n cours
-myModels.Filiere.hasMany(myModels.Etudiant);
-myModels.Etudiant.belongsTo(myModels.Filiere);
+myModels.Filiere.hasMany(myModels.User);
+myModels.User.belongsTo(myModels.Filiere);
 
 //niveau a un ou n cours
-myModels.Niveau.hasMany(myModels.Etudiant);
-myModels.Etudiant.belongsTo(myModels.Niveau);
+myModels.Niveau.hasMany(myModels.User);
+myModels.User.belongsTo(myModels.Niveau);
 
 //specialite a un ou n cours
-myModels.Specialite.hasMany(myModels.Etudiant);
-myModels.Etudiant.belongsTo(myModels.Specialite);
+myModels.Specialite.hasMany(myModels.User);
+myModels.User.belongsTo(myModels.Specialite);
 
-
-/**
- * module document
+/********************************************************************************************************************************************
+ * role a un ou n user
+ * permission a n ou n role
  */
 
-//Cours a n ou n domaine
-myModels.Cours.belongsToMany(myModels.Domaine, {through: 'coursDomaine'});
-myModels.Domaine.belongsToMany(myModels.Cours, {through: 'coursDomaine'});
+//role a un ou n user
+myModels.Role.hasMany(myModels.User);
+myModels.User.belongsTo(myModels.Role);
 
-//livre a n ou n domaine
-myModels.Livre.belongsToMany(myModels.Domaine, {through: 'domaineLivre'});
-myModels.Domaine.belongsToMany(myModels.Livre, {through: 'domaineLivre'});
+//role a n ou n permission
+myModels.Role.belongsToMany(myModels.Permission, {through: 'PermissionRole'});
+myModels.Permission.belongsToMany(myModels.Role, {through: 'PermissionRole'});
 
-//livre envoie un ou n signalement
-myModels.Livre.hasMany(myModels.Signalement, { foreignKey: {allowNull: false}});
-myModels.Signalement.belongsTo(myModels.Livre);
+/************************************************** user et document* ************************************************************/
+/* 
+* role a un ou n user
+* permission a n ou n role
+*/
 
-/**
+//role a un ou n user
+myModels.Type.hasMany(myModels.Document);
+myModels.Document.belongsTo(myModels.Type);
+
+//document a n ou n domaine
+myModels.Domaine.belongsToMany(myModels.Document, {through: 'DocumentDomaine'});
+myModels.Document.belongsToMany(myModels.Domaine, {through: 'DocumentDomaine'});
+
+//user aime n ou n domaine
+myModels.User.hasMany(myModels.Domaine);
+myModels.Domaine.belongsTo(myModels.User);
+
+
+
+/************************************************************************************************
  * module faculte , filiere, specialite
  */
 
 //faculte a un ou n cours
-myModels.Faculte.hasMany(myModels.Cours);
-myModels.Cours.belongsTo(myModels.Faculte);
+myModels.Faculte.hasMany(myModels.Document);
+myModels.Document.belongsTo(myModels.Faculte);
 
 //Filiere a un ou n cours
-myModels.Filiere.hasMany(myModels.Cours);
-myModels.Cours.belongsTo(myModels.Filiere);
+myModels.Filiere.hasMany(myModels.Document);
+myModels.Document.belongsTo(myModels.Filiere);
 
 //niveau a un ou n cours
-myModels.Niveau.hasMany(myModels.Cours);
-myModels.Cours.belongsTo(myModels.Niveau);
+myModels.Niveau.hasMany(myModels.Document);
+myModels.Document.belongsTo(myModels.Niveau);
 
 //specialite a un ou n cours
-myModels.Specialite.hasMany(myModels.Cours);
-myModels.Cours.belongsTo(myModels.Specialite);
+myModels.Specialite.hasMany(myModels.Document);
+myModels.Document.belongsTo(myModels.Specialite);
 
 //faculte a un ou n fliere
 myModels.Faculte.hasMany(myModels.Filiere);
@@ -248,24 +193,9 @@ myModels.Niveau.belongsToMany(myModels.Filiere, {through: 'filiereNiveau'});
 myModels.Specialite.belongsToMany(myModels.Niveau, {through: 'filiereNiveau'});
 myModels.Niveau.belongsToMany(myModels.Specialite, {through: 'filiereNiveau'});
 
-/***
- * role a un ou n user
- * permission a n ou n role
- */
-
-//role a un ou n user
-myModels.Role.hasMany(myModels.User);
-myModels.User.belongsTo(myModels.Role);
-
-myModels.Admin.hasMany(myModels.User);
-myModels.User.belongsTo(myModels.Admin);
-
-//role a n ou n permission
-myModels.Role.belongsToMany(myModels.Permission, {through: 'PermissionRole'});
-myModels.Permission.belongsToMany(myModels.Role, {through: 'PermissionRole'});
-
-//myModels.User.belongsToMany(myModels.Document, {through: 'C'});
-//myModels.Document.belongsToMany(myModels.User, {through: 'C'});
+//document recoit un ou n signalement
+myModels.Document.hasMany(myModels.Signalement);
+myModels.Signalement.belongsTo(myModels.Document);
 
 module.exports = myModels;
 
