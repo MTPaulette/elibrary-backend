@@ -44,7 +44,7 @@ const db = require("./models");
 //bring in the Users route
 const users = require('./routes/api/users');
 app.use('/api/users', users)
-
+ 
 //bring in the admin route
 const admins = require('./routes/api/admins');
 app.use('/api/admins', admins)
@@ -65,6 +65,13 @@ app.use('/api/specialites', specialites)
 const niveaux = require('./routes/api/niveaux');
 app.use('/api/niveaux', niveaux)
 
+/** catch 404 and forward to error handler */
+app.use('*', (req, res) => {
+  return res.status(404).json({
+    success: false,
+    message: 'API endpoint doesnt exist'
+  })
+});
 //start server
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log('server started on port '+ port));
