@@ -143,6 +143,9 @@ myModels.Permission.belongsToMany(myModels.Role, {through: 'PermissionRole'});
 * permission a n ou n role
 */
 
+myModels.User.hasMany(myModels.Document);
+myModels.Document.belongsTo(myModels.User);
+
 //role a un ou n user
 myModels.Type.hasMany(myModels.Document);
 myModels.Document.belongsTo(myModels.Type);

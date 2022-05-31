@@ -31,10 +31,6 @@ module.exports = (sequelize,Sequelize) => {
             type: Sequelize.STRING,
             allowNull: true
         },
-        photo: {
-            type: Sequelize.STRING,
-            allowNull: true
-        },
     },
     {
         timestamps: true,

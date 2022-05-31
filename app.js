@@ -9,21 +9,10 @@ const cors = require('cors');
 const app = express();
 
 app.use(bodyParser.json());
-/*
-const headerConfigCors = function(req, res, next) {
-  res.header('Access-Control-Allow-Origin' , "*");
-  res.header('Access-Control-Allow-Credentials' , true);
-  res.header('Access-Control-Allows-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requestde-With, Content-Type, Accept');
-  next(); 
-}
-app.use(headerConfigCors);
-*/
-
 app.use(cors());
 //json middleware
 app.use(bodyParser.urlencoded({
-    extended: false
+    extended: true
 }));
 
 //configuration the static directory
@@ -44,10 +33,6 @@ const db = require("./models");
 //bring in the Users route
 const users = require('./routes/api/users');
 app.use('/api/users', users)
- 
-//bring in the admin route
-const admins = require('./routes/api/admins');
-app.use('/api/admins', admins)
 
 //bring in the faculte route
 const facultes = require('./routes/api/facultes');
@@ -65,6 +50,14 @@ app.use('/api/specialites', specialites)
 const niveaux = require('./routes/api/niveaux');
 app.use('/api/niveaux', niveaux)
 
+//bring in the documents route
+const documents = require('./routes/api/documents');
+app.use('/api/documents', documents)
+
+const wanda = require('./routes/api/bhhh');
+app.use('/wanda', wanda)
+
+
 /** catch 404 and forward to error handler */
 app.use('*', (req, res) => {
   return res.status(404).json({
@@ -72,6 +65,39 @@ app.use('*', (req, res) => {
     message: 'API endpoint doesnt exist'
   })
 });
+
+
+
+/***************************************************************************************** chat ***************************************************************************************** */
+
+/*const http = require("http");
+const logger = require("morgan");
+const socketio = require("socket.io");
+
+// socket configuration
+const WebSockets = require("./utils/WebSockets.js");
+
+// routes
+const indexRouter = require("./routes/api/chat/index");
+const userRouter = require("./routes/api/chat/user");
+const chatRoomRouter = require("./routes/api/chat/chatRoom");
+const deleteRouter = require("./routes/api/chat/delete");
+
+app.use(logger("dev"));
+
+app.use("/", indexRouter);
+app.use("/users", userRouter);
+app.use("/room", decode, chatRoomRouter);
+app.use("/delete", deleteRouter);
+
+/** Create HTTP server. */
+//const server = http.createServer(app);
+/** Create socket connection */
+/*
+global.io = socketio.listen(server);
+global.io.on('connection', WebSockets.connection)
+*/
+
 //start server
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log('server started on port '+ port));
