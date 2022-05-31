@@ -37,8 +37,8 @@ const app = express();
   });
 
 /**
- * @route post api/users/ajouterenseignant
- * @desc pour permettre la creation des cmptes enseignants par l'admin
+ * @route post api/users/ajouterdocument
+ * @desc pour permettre la creation des cmptes documents par l'admin
  * @access Public
  */
 /*
@@ -47,22 +47,9 @@ const app = express();
 });
 */
  router.post('/createDocument',   upload.single('myFile'), passport.authenticate('jwt',{ session: false }),(req, document, res) => {
-
     try {
         helper.checkPermission(req.user.RoleId, 'crud_document').then(rolePerm => {
             if(rolePerm){
-
-                
-               /* (upload.single('myFile'), async (req, res) => {
-                    return res.json({
-                        success: false,
-                        msg: 'fichier uploade',
-                        document: req.file
-                    });
-                    DocumentController.createDocument(req,res)
-                });
-                */
-                
                 DocumentController.createDocument(req, document, res)
             }else{
                 return res.json({
@@ -80,13 +67,13 @@ const app = express();
 
 /****************************************gestion des utilisateurs************************************* */
 /**
- * @route get api/users/bloquerenseignant
- * @desc pour permettre le blocage des comptes enseignants par l'admin
+ * @route get api/users/bloquerdocument
+ * @desc pour permettre le blocage des comptes documents par l'admin
  * @access Public
  */
  router.get('/bloquerDocument/:id', passport.authenticate('jwt', { session: false }),(req,res) => {
     try {
-        helper.checkPermission(req.user.RoleId, 'bloquer_user').then(rolePerm => {
+        helper.checkPermission(req.user.RoleId, 'crud_document').then(rolePerm => {
             if(rolePerm){
                 DocumentController.bloquerDocument(req,res)
             }else{
@@ -102,5 +89,195 @@ const app = express();
     }
 });
 
+/**
+ * @route get api/users/debloquerDocument
+ * @desc pour permettre le blocage des comptes documents par l'admin
+ * @access Public
+ */
+ router.get('/debloquerDocument/:id', passport.authenticate('jwt', { session: false }),(req,res) => {
+    try {
+        helper.checkPermission(req.user.RoleId, 'crud_document').then(rolePerm => {
+            if(rolePerm){
+                DocumentController.debloquerDocument(req,res)
+            }else{
+                return res.json({
+                    success: false,
+                    msg: 'role ou permission incompatible',
+                    rolePerm: rolePerm
+                });
+            }
+        } )
+    } catch ( err) {
+        console.log(err)
+    }
+});
+
+/**
+ * @route get api/users/supprimerDocument
+ * @desc pour permettre le blocage des comptes documents par l'admin
+ * @access Public
+ */
+ router.get('/supprimerDocument/:id', passport.authenticate('jwt', { session: false }),(req,res) => {
+    try {
+        helper.checkPermission(req.user.RoleId, 'crud_document').then(rolePerm => {
+            if(rolePerm){
+                DocumentController.supprimerDocument(req,res)
+            }else{
+                return res.json({
+                    success: false,
+                    msg: 'role ou permission incompatible',
+                    rolePerm: rolePerm
+                });
+            }
+        } )
+    } catch ( err) {
+        console.log(err)
+    }
+});
+
+
+
+/****************************************gestion des documents************************************* */
+/**
+ * @route get api/users/tousDocuments
+ * @desc pour recherche tous les documents
+ * @access Public
+ */
+ router.get('/tousDocuments', passport.authenticate('jwt', { session: false }),(req,res) => {
+    try {
+        helper.checkPermission(req.user.RoleId, 'touteRecherche').then(rolePerm => {
+            if(rolePerm){
+                const req = {
+                    RoleId: 2
+                }
+                UserController.findAllUser(req,res)
+            }
+        } )
+    } catch ( err) {
+        console.log(err)
+    }
+});
+
+/**
+ * @route get api/users/TousDocumentsActifs
+ * @desc pour recherche tous les documents actifs
+ * @access Public
+ */
+
+ router.get('/TousDocumentsActifs', passport.authenticate('jwt', { session: false }),(req,res) => {
+    try {
+        helper.checkPermission(req.user.RoleId, 'touteRecherche').then(rolePerm => {
+            if(rolePerm){
+                const req = {
+                    RoleId: 2,
+                    etat: 'actif'
+                }
+                UserController.findAllUserState(req,res)
+            }
+        } )
+    } catch ( err) {
+        console.log(err)
+    }
+});
+
+/**
+ * @route get api/users/TousDocumentsBloques
+ * @desc pour recherche tous les documents bloqués
+ * @access Public
+ */
+ router.get('/TousDocumentsBloques', passport.authenticate('jwt', { session: false }),(req,res) => {
+    try {
+        helper.checkPermission(req.user.RoleId, 'touteRecherche').then(rolePerm => {
+            if(rolePerm){
+                const req = {
+                    RoleId: 2,
+                    etat: 'bloqué'
+                }
+                UserController.findAllUserState(req,res)
+            }
+        } )
+    } catch ( err) {
+        console.log(err)
+    }
+});
+
+
+/**
+ * @route get api/users/TousDocumentsSupprimes
+ * @desc pour recherche tous les documents supprimés
+ * @access Public
+ */
+ router.get('/TousDocumentsSupprimes', passport.authenticate('jwt', { session: false }),(req,res) => {
+    try {
+        helper.checkPermission(req.user.RoleId, 'touteRecherche').then(rolePerm => {
+            if(rolePerm){
+                const req = {
+                    RoleId: 2,
+                    etat: 'supprimé'
+                }
+                UserController.findAllUserState(req,res)
+            }
+        } )
+    } catch ( err) {
+        console.log(err)
+    }
+});
+
+/**
+ * @route get api/users/documentActif
+ * @desc pour rechercher un document actif par son nom
+ * @access Public
+ */
+ router.get('/documentActif/:nom', passport.authenticate('jwt', { session: false }),(req,res) => {
+    try {
+        helper.checkPermission(req.user.RoleId, 'rechercher_document').then(rolePerm => {
+            if(rolePerm){
+                req.RoleId = 2;
+                req.etat = 'actif';
+                UserController.findOneUser(req,res);
+            }
+        } )
+    } catch ( err) {
+        console.log(err)
+    }
+});
+
+/**
+ * @route get api/users/documentBloque
+ * @desc pour rechercher un document actif par son nom
+ * @access Public
+ */
+ router.get('/documentBloque/:nom', passport.authenticate('jwt', { session: false }),(req,res) => {
+    try {
+        helper.checkPermission(req.user.RoleId, 'touteRecherche').then(rolePerm => {
+            if(rolePerm){
+                req.RoleId = 2;
+                req.etat = 'bloque';
+                UserController.findOneUser(req,res);
+            }
+        } )
+    } catch ( err) {
+        console.log(err)
+    }
+});
+
+/**
+ * @route get api/users/documentSupprime
+ * @desc pour rechercher un document actif par son nom
+ * @access Public
+ */
+ router.get('/documentSupprime/:nom', passport.authenticate('jwt', { session: false }),(req,res) => {
+    try {
+        helper.checkPermission(req.user.RoleId, 'touteRecherche').then(rolePerm => {
+            if(rolePerm){
+                req.RoleId = 2;
+                req.etat = 'supprime';
+                UserController.findOneUser(req,res);
+            }
+        } )
+    } catch ( err) {
+        console.log(err)
+    }
+});
 
 module.exports = router;

@@ -1,23 +1,3 @@
-/*
-const db = require("../config/connectionDB");
-const/ Sequelize = require("sequelize");
-
-const connectDB = new Sequelize(db.database, db.user, db.password, {
-    host: db.host,
-    dialect: db.dialect,
-    //operatorsAliases: false,
-    pool: {
-        max: db.pool.max,
-        min: db.pool.min,
-        acquire: db.pool.acquire,
-        idle: db.pool.idle,
-    }
-});
-
-module.exports = connectDB;
-
-*/
-
 const db = require("../config/connectionDB");
 const Sequelize = require("sequelize");
 
@@ -108,6 +88,8 @@ myModels.Notification.belongsTo(myModels.Admin);
 myModels.Epreuve.hasMany(myModels.Correction);
 myModels.Correction.belongsTo(myModels.Epreuve)
 */
+myModels.User.hasMany(myModels.User);
+myModels.User.belongsTo(myModels.User)
 //faculte a un ou n etudiant
 myModels.Faculte.hasMany(myModels.User);
 myModels.User.belongsTo(myModels.Faculte);

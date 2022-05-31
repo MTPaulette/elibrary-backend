@@ -54,9 +54,9 @@ app.use('/api/niveaux', niveaux)
 const documents = require('./routes/api/documents');
 app.use('/api/documents', documents)
 
-const wanda = require('./routes/api/bhhh');
-app.use('/wanda', wanda)
-
+//bring in the domaines route
+const domaines = require('./routes/api/domaines');
+app.use('/api/domaines', domaines)
 
 /** catch 404 and forward to error handler */
 app.use('*', (req, res) => {

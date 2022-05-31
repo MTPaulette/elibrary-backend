@@ -19,13 +19,13 @@ module.exports = (sequelize,Sequelize) => {
         },
         etat: {
             type: Sequelize.STRING,
-            allowNull: true,
-            default: 'actif'
+            allowNull: false,
+            defaultValue: 'actif'
         },
         nbTelechargement: {
             type: Sequelize.INTEGER,
-            allowNull: true,
-            default: 0,
+            allowNull: false,
+            defaultValue: 0,
         },
         auteur: {
             type: Sequelize.STRING,

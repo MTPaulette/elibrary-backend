@@ -157,7 +157,7 @@ exports.registerEnseignant = async (req, res) => {
                     user.setRole(3);
                 }else {
                     if(req.user.RoleId == 1) {
-                        user.setAdmin(1);
+                        user.setUser(1);
                         user.setRole(2);
                     }
                 }
@@ -188,8 +188,8 @@ exports.bloquerUser = async (req, res) => {
         });
     }
     userWithId.update({etat: "bloqué"}).then(user => {
-        user.setAdmin(req.user.RoleId);
-        //user.setAdminBloqueur(req.user.instance);
+        user.setUser(req.user);
+        //user.setUserBloqueur(req.user.instance);
         return res.status(201).json({
             success: true,
             msg: "user bloqué avec success",
