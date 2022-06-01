@@ -1,10 +1,11 @@
 // utils
-import makeValidation from '@withvoid/make-validation';
+const makeValidation = require('@withvoid/make-validation');
+const makeValidation = require('../../node_modules/');
 // models
-import UserModel, { USER_TYPES } from '../models/User.js';
+const  {UserModel, USER_TYPES } = require('../../models/chat/User');
 
-export default {
-  onGetAllUsers: async (req, res) => {
+
+exports.onGetAllUsers = async (req, res) => {
     try {
       const users = await UserModel.getUsers();
       return res.status(200).json({ success: true, users });
@@ -12,7 +13,8 @@ export default {
       return res.status(500).json({ success: false, error: error })
     }
   },
-  onGetUserById: async (req, res) => {
+
+  exports.onGetUserById = async (req, res) => {
     try {
       const user = await UserModel.getUserById(req.params.id);
       return res.status(200).json({ success: true, user });
@@ -20,7 +22,8 @@ export default {
       return res.status(500).json({ success: false, error: error })
     }
   },
-  onCreateUser: async (req, res) => {
+
+  exports.onCreateUser = async (req, res) => {
     try {
       const validation = makeValidation(types => ({
         payload: req.body,
@@ -39,7 +42,8 @@ export default {
       return res.status(500).json({ success: false, error: error })
     }
   },
-  onDeleteUserById: async (req, res) => {
+
+  exports.onDeleteUserById = async (req, res) => {
     try {
       const user = await UserModel.deleteByUserById(req.params.id);
       return res.status(200).json({ 
@@ -49,5 +53,4 @@ export default {
     } catch (error) {
       return res.status(500).json({ success: false, error: error })
     }
-  },
-}
+  }

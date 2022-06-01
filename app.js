@@ -58,19 +58,10 @@ app.use('/api/documents', documents)
 const domaines = require('./routes/api/domaines');
 app.use('/api/domaines', domaines)
 
-/** catch 404 and forward to error handler */
-app.use('*', (req, res) => {
-  return res.status(404).json({
-    success: false,
-    message: 'API endpoint doesnt exist'
-  })
-});
-
-
 
 /***************************************************************************************** chat ***************************************************************************************** */
-
-/*const http = require("http");
+/*
+const http = require("http");
 const logger = require("morgan");
 const socketio = require("socket.io");
 
@@ -97,6 +88,14 @@ app.use("/delete", deleteRouter);
 global.io = socketio.listen(server);
 global.io.on('connection', WebSockets.connection)
 */
+
+/** catch 404 and forward to error handler */
+app.use('*', (req, res) => {
+  return res.status(404).json({
+    success: false,
+    message: 'API endpoint doesnt exist'
+  })
+});
 
 //start server
 const port = process.env.PORT || 5000;
