@@ -171,16 +171,7 @@ exports.supprimerDocument = async (req, res) => {
  */
 //find all document from the database
 exports.findAllDocument = async (req, res) => {
-    let allDocument = {}
-    if (!req.RoleId) {
-        allDocument = await Document.findAll();
-    } else {
-        allDocument = await Document.findAll({
-            where: {
-                RoleId: req.RoleId
-            }
-        }); 
-    }
+    allDocument = await Document.findAll();
     if (allDocument) {
         return res.status(201).json({
             success: true,
@@ -193,6 +184,25 @@ exports.findAllDocument = async (req, res) => {
     }
 };
 
+//recherche de tous les enseigants bloqués
+exports.findAllDocumentStateActif = async (req, res) => {
+    //check for the unique id
+    const allDocument = await Document.findAll({
+        where: {
+            etat: req.etat
+        }
+    });
+    if (allDocument) {
+        return res.status(201).json({
+            success: true,
+            allDocument: allDocument
+        });
+    } else {
+        return res.status(500).json({
+            success: false
+        });
+    }
+};
 //recherche de tous les enseigants bloqués
 exports.findAllDocumentState = async (req, res) => {
     //check for the unique id

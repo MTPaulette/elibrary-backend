@@ -150,7 +150,7 @@ const app = express();
                 const req = {
                     RoleId: 2
                 }
-                DocumentController.findAllDocument(req,res)
+                UserController.findAllUser(req,res)
             }
         } )
     } catch ( err) {
@@ -164,9 +164,20 @@ const app = express();
  * @access Public
  */
 
- router.get('/TousDocumentsActifs', (req,res) => { 
-    req.etat = 'actif';
-    DocumentController.findAllDocumentStateActif(req,res)
+ router.get('/TousDocumentsActifs', passport.authenticate('jwt', { session: false }),(req,res) => {
+    try {
+        helper.checkPermission(req.user.RoleId, 'touteRecherche').then(rolePerm => {
+            if(rolePerm){
+                const req = {
+                    RoleId: 2,
+                    etat: 'actif'
+                }
+                UserController.findAllUserState(req,res)
+            }
+        } )
+    } catch ( err) {
+        console.log(err)
+    }
 });
 
 /**
@@ -182,7 +193,7 @@ const app = express();
                     RoleId: 2,
                     etat: 'bloqué'
                 }
-                DocumentController.findAllDocumentState(req,res)
+                UserController.findAllUserState(req,res)
             }
         } )
     } catch ( err) {
@@ -204,7 +215,7 @@ const app = express();
                     RoleId: 2,
                     etat: 'supprimé'
                 }
-                DocumentController.findAllDocumentState(req,res)
+                UserController.findAllUserState(req,res)
             }
         } )
     } catch ( err) {
@@ -217,10 +228,18 @@ const app = express();
  * @desc pour rechercher un document actif par son nom
  * @access Public
  */
- router.get('/documentActif/:nom' ,(req,res) => {
-    req.RoleId = 2;
-    req.etat = 'actif';
-    DocumentController.findOneDocument(req,res);
+ router.get('/documentActif/:nom', passport.authenticate('jwt', { session: false }),(req,res) => {
+    try {
+        helper.checkPermission(req.user.RoleId, 'rechercher_document').then(rolePerm => {
+            if(rolePerm){
+                req.RoleId = 2;
+                req.etat = 'actif';
+                UserController.findOneUser(req,res);
+            }
+        } )
+    } catch ( err) {
+        console.log(err)
+    }
 });
 
 /**
@@ -234,7 +253,7 @@ const app = express();
             if(rolePerm){
                 req.RoleId = 2;
                 req.etat = 'bloque';
-                DocumentController.findOneDocument(req,res);
+                UserController.findOneUser(req,res);
             }
         } )
     } catch ( err) {
@@ -253,7 +272,7 @@ const app = express();
             if(rolePerm){
                 req.RoleId = 2;
                 req.etat = 'supprime';
-                DocumentController.findOneDocument(req,res);
+                UserController.findOneUser(req,res);
             }
         } )
     } catch ( err) {
