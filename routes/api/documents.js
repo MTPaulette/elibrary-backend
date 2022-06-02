@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router();
 const path = require("path");
 const passport = require('passport');
+
 const DocumentController = require('../../controllers/documentController');
+const Document = require('../../models').Document;
+
 const helper = require('../../utils/helper.js');
 const multer = require("multer");
 
@@ -16,8 +19,8 @@ const app = express();
     },
     filename: (req, file, cb) => {
         const ext = file.mimetype.split("/")[1];
-        //cb(null, `${contenu.name}-${Date.now()}.${ext}`);
         cb(null, `upload/admin-${file.originalname}-${Date.now()}.${ext}`);
+        //cb(null, file.originalname);
     },
     });
     
@@ -63,7 +66,35 @@ const app = express();
         console.log(err)
     }
 });
+/*********************************************************************************************************************************************************************/
 
+router.get("/telecharger/:id", async (req, res) => {
+    //check for the unique id
+    const allDocument = await Document.findByPk(req.params.id);
+    /**/
+
+    //return res.download(allDocument.contenu)
+    if (allDocument) {
+        return res.status(201).json({
+            success: false,
+            allDocument: allDocument
+        });
+    } else {
+        return res.status(500).json({
+            success: false
+        });
+    }
+    /*
+    picModel.find({ _id: req.params.id }, (err, data) => {
+      if (err) {
+        console.log(err);
+      } else {
+        var x = __dirname + "/public/" + data[0].picpath;
+        res.download(x);
+      }
+    });
+    */
+  });
 
 /****************************************gestion des utilisateurs************************************* */
 /**
