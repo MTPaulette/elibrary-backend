@@ -71,29 +71,7 @@ const app = express();
 router.get("/telecharger/:id", async (req, res) => {
     //check for the unique id
     const allDocument = await Document.findByPk(req.params.id);
-    /**/
-
-    //return res.download(allDocument.contenu)
-    if (allDocument) {
-        return res.status(201).json({
-            success: false,
-            allDocument: allDocument
-        });
-    } else {
-        return res.status(500).json({
-            success: false
-        });
-    }
-    /*
-    picModel.find({ _id: req.params.id }, (err, data) => {
-      if (err) {
-        console.log(err);
-      } else {
-        var x = __dirname + "/public/" + data[0].picpath;
-        res.download(x);
-      }
-    });
-    */
+    return res.sendFile(path.join(__dirname + '../../../public/upload/' + allDocument.contenu));
   });
 
 /****************************************gestion des utilisateurs************************************* */

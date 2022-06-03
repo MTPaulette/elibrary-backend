@@ -8,15 +8,64 @@ const cors = require('cors');
 //initialize the app
 const app = express();
 
-app.use(bodyParser.json());
+app.use(function (req, res, next) {
+  res.setHeader(
+    'Report-To',
+    '{"group":"csp-endpoint","max_age":10886400,"endpoints":[{"url":"http://localhost:5000/__cspreport__"}],"include_subdomains":true}'
+  );
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://images.unsplash.com; script-src 'self' https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/ 'sha256-INJfZVfoUd61ITRFLf63g+S/NJAfswGDl15oK0iXgYM='; style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css; frame-src 'self' https://www.youtube.com https://youtube.com; report-to csp-endpoint; report-uri /__cspreport__;"
+  );
+  next();
+});
+
+app.use(
+  bodyParser.json({
+    type: [
+      'application/json',
+      'application/csp-report',
+      'application/reports+json',
+    ],
+  })
+);
+/*
+app.use(express.static(__dirname+'/public'));
+app.use(express.static(path.join(__dirname + '/public/upload')));
+app.use(express.static(path.join(__dirname + '/public/')));
+*/
+app.use(express.static(path.join(__dirname)));
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname + '/public/bg.jpg'));
+});
+
+app.post('/__cspreport__', (req, res) => {
+  console.log(req.body);
+});
+
+
+
+
+
+
+
+
+
+
+
+app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+// app.use(bodyParser.json());
 app.use(cors());
+
 //json middleware
 app.use(bodyParser.urlencoded({
-    extended: true
+    extended: false
 }));
 
+
 //configuration the static directory
-app.use(express.static(path.join(__dirname, 'public')));
+//app.use(express.static(__dirname+'/public'));
 
 //use the passport middleware
 app.use(passport.initialize());
@@ -89,13 +138,16 @@ global.io = socketio.listen(server);
 global.io.on('connection', WebSockets.connection)
 */
 
-/** catch 404 and forward to error handler */
+/** catch 404 and forward to error handler
 app.use('*', (req, res) => {
   return res.status(404).json({
     success: false,
     message: 'API endpoint doesnt exist'
   })
 });
+ */
+app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 //start server
 const port = process.env.PORT || 5000;

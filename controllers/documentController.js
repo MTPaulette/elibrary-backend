@@ -16,7 +16,7 @@ exports.createDocument = async (req, res) => {
         resume,
         auteur,
         type,
-        contenu: req.file.path,
+        contenu: req.file.originalname,
         FaculteId,
         FiliereId,
         NiveauId,
