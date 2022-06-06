@@ -12,6 +12,7 @@ const multer = require("multer");
 const app = express();
 
     app.use(express.static(`${__dirname}/public`));
+    // __dirname + '../../../public/upload/'
     //Configuration for Multer
     const multerStorage = multer.diskStorage({
         destination: (req, file, cb) => {
@@ -19,7 +20,7 @@ const app = express();
     },
     filename: (req, file, cb) => {
         const ext = file.mimetype.split("/")[1];
-        cb(null, `upload/admin-${file.originalname}-${Date.now()}.${ext}`);
+        cb(null, `upload/${file.originalname}`);
         //cb(null, file.originalname);
     },
     });
@@ -44,16 +45,17 @@ const app = express();
  * @desc pour permettre la creation des cmptes documents par l'admin
  * @access Public
  */
-/*
- router.post('/createDocument', upload.single('myFile'), (req,res) => {
-        DocumentController.createDocument(req,res);
+
+ /*router.post('/createDocument', upload.single('myFile'), (req,res) => {
+    DocumentController.createDocument(req,res);
 });
 */
- router.post('/createDocument',   upload.single('myFile'), passport.authenticate('jwt',{ session: false }),(req, document, res) => {
+ //router.post('/createDocument', passport.authenticate('jwt',{ session: false }),(req, res) => {
+router.post('/createDocument', upload.single('myFile') ,passport.authenticate('jwt',{ session: false }),(req, res) => {
     try {
         helper.checkPermission(req.user.RoleId, 'crud_document').then(rolePerm => {
             if(rolePerm){
-                DocumentController.createDocument(req, document, res)
+                DocumentController.createDocument(req, res)
             }else{
                 return res.json({
                     success: false,
@@ -65,6 +67,7 @@ const app = express();
     } catch ( err) {
         console.log(err)
     }
+    
 });
 /*********************************************************************************************************************************************************************/
 

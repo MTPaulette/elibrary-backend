@@ -9,8 +9,8 @@ const { Op } = require("sequelize");
 //ajouter un nouvel document
 exports.createDocument = async (req, res) => {
     let { titre, resume, auteur, type, FaculteId, FiliereId, NiveauId, SpecialiteId} = req.body;
+
     //the data is valid and now we can register the admin
-    
     let newDocument= {
         titre,
         resume,
@@ -47,7 +47,6 @@ exports.createDocument = async (req, res) => {
             });
 
         }
-        
     });
   //});
 };

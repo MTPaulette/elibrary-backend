@@ -14,7 +14,7 @@ opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = key;
 
 const strategy = new JwtStrategy(opts, async (jwt_payload, done) => {
-    await User.findByPk(jwt_payload._id).then(user => {
+    await User.findByPk(jwt_payload.id).then(user => {
         if (user) {
             return done(null, user); 
         } else {
@@ -46,7 +46,7 @@ opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = key;
 
 const strategy = new JwtStrategy(opts, async (jwt_payload, done) => {
-    await User.findByPk(jwt_payload._id).then(user => {
+    await User.findByPk(jwt_payload.id).then(user => {
 
         if (user) {
             const userResult = {
@@ -55,7 +55,7 @@ const strategy = new JwtStrategy(opts, async (jwt_payload, done) => {
             }
             return done(null, userResult); 
         } else {
-            Admin.findByPk(jwt_payload._id).then(admin => {
+            Admin.findByPk(jwt_payload.id).then(admin => {
                 const adminResult = {
                     instance: admin,
                     role: 'admin'

@@ -30,7 +30,7 @@ exports.login = async (req, res) => {
     bcrypt.compare(password, user.password).then(isMatch => {
         if(isMatch) {
             const jwt_payload = {
-                _id: user.id,
+                id: user.id,
                 email: user.email,
                 password: user.password,
                 role: user.RoleId
@@ -44,8 +44,6 @@ exports.login = async (req, res) => {
                     token: 'Bearer '+ token,
                     user: user,
                     msg: "Bingo!!! vous êtes connectés",
-                    password: true,
-                    email: true
                 });
             })
         }else {
@@ -61,7 +59,7 @@ exports.login = async (req, res) => {
 //ajouter un nouvel user
 exports.register = async (req, res) => {
     
-    let { nom, email, password, confirm_password, FaculteId, FiliereId, NiveauId, SpecialiteId} = req.body
+    let { username, email, password, confirm_password, FaculteId, FiliereId, NiveauId, SpecialiteId} = req.body
     //check the confirm password
     if(password !== confirm_password){
         return res.status(400).json({
@@ -85,7 +83,7 @@ exports.register = async (req, res) => {
     //the data is valid and now we can register the admin
     let newUser= {
         //let newUser= new User({
-        nom,
+        username,
         email,
         password,
         FaculteId,
@@ -118,7 +116,7 @@ exports.register = async (req, res) => {
 //ajouter un nouvel user
 exports.registerEnseignant = async (req, res) => {
     
-    let { nom, email, password, confirm_password, FaculteId, FiliereId, SpecilaiteId} = req.body
+    let { username, email, password, confirm_password, FaculteId, FiliereId, SpecilaiteId} = req.body
     //check the confirm password
     if(password !== confirm_password){
         return res.status(400).json({
@@ -142,7 +140,7 @@ exports.registerEnseignant = async (req, res) => {
     //the data is valid and now we can register the admin
     let newUser= {
         //let newUser= new User({
-        nom,
+        username,
         email,
         password
     };
@@ -187,15 +185,7 @@ exports.bloquerUser = async (req, res) => {
             msg: "email pas trouvé",
         });
     }
-    userWithId.update({etat: "bloqué"}).then(user => {
-        user.setUser(req.user);
-        //user.setUserBloqueur(req.user.instance);
-        return res.status(201).json({
-            success: true,
-            msg: "user bloqué avec success",
-            user_bloqué: user
-        });
-    });
+    userWithId.update({etat: "bloqué"})
 };
 
 //deblouer un nouvel user
@@ -212,13 +202,7 @@ exports.debloquerUser = async (req, res) => {
             msg: "email pas trouvé",
         });
     }
-    userWithId.update({etat: "actif"}).then(user => {
-        return res.status(201).json({
-            success: true,
-            msg: "user debloque",
-            user_debloqué: user
-        });
-    });
+    userWithId.update({etat: "actif"})
 };
 
 //supprime un nouvel user
@@ -291,7 +275,7 @@ exports.findAllUserState = async (req, res) => {
         }
     });
     if (allUser) {
-        return res.status(201).json({
+        return res.json({
             success: true,
             allUser: allUser
         });
@@ -307,8 +291,8 @@ exports.findOneUser = async (req, res) => {
     //check for the unique id
     const allUser = await User.findAll({
         where: {
-            nom: {
-                [Op.substring]: req.params.nom,
+            username: {
+                [Op.substring]: req.params.username,
             },
             RoleId: req.RoleId,
             etat: req.etat
