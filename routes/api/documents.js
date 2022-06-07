@@ -74,6 +74,8 @@ router.post('/createDocument', upload.single('myFile') ,passport.authenticate('j
 router.get("/telecharger/:id", async (req, res) => {
     //check for the unique id
     const allDocument = await Document.findByPk(req.params.id);
+    let nb = allDocument.nbTelechargement+1;
+    allDocument.update({nbTelechargement: nb})
     return res.sendFile(path.join(__dirname + '../../../public/upload/' + allDocument.contenu));
   });
 
@@ -178,7 +180,7 @@ router.get("/telecharger/:id", async (req, res) => {
 
  router.get('/TousDocumentsActifs', (req,res) => { 
     req.etat = 'actif';
-    DocumentController.findAllDocumentStateActif(req,res)
+    DocumentController.findAllDocumentState(req,res)
 });
 
 /**
@@ -190,10 +192,7 @@ router.get("/telecharger/:id", async (req, res) => {
     try {
         helper.checkPermission(req.user.RoleId, 'touteRecherche').then(rolePerm => {
             if(rolePerm){
-                const req = {
-                    RoleId: 2,
-                    etat: 'bloqué'
-                }
+                req.etat = 'bloqué';
                 DocumentController.findAllDocumentState(req,res)
             }
         } )
@@ -212,10 +211,7 @@ router.get("/telecharger/:id", async (req, res) => {
     try {
         helper.checkPermission(req.user.RoleId, 'touteRecherche').then(rolePerm => {
             if(rolePerm){
-                const req = {
-                    RoleId: 2,
-                    etat: 'supprimé'
-                }
+                req.etat = 'supprimé';
                 DocumentController.findAllDocumentState(req,res)
             }
         } )
@@ -264,7 +260,7 @@ router.get("/telecharger/:id", async (req, res) => {
         helper.checkPermission(req.user.RoleId, 'touteRecherche').then(rolePerm => {
             if(rolePerm){
                 req.RoleId = 2;
-                req.etat = 'supprime';
+                req.etat = 'supprimé';
                 DocumentController.findOneDocument(req,res);
             }
         } )

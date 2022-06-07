@@ -1,4 +1,4 @@
-const { User } = require("../models/index");
+const { User, Faculte, Filiere, Niveau, Specialite, Role } = require("../models/index");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const key = require("../models/index").key;
@@ -14,7 +14,8 @@ exports.login = async (req, res) => {
     const user = await User.findOne ({
         where: {
             email: email
-        }
+        },
+        include: [Faculte, Filiere, Niveau, Specialite, Role]
     })
 
     if(!user) {
@@ -113,6 +114,7 @@ exports.register = async (req, res) => {
 
 };
 
+/*
 //ajouter un nouvel user
 exports.registerEnseignant = async (req, res) => {
     
@@ -169,7 +171,7 @@ exports.registerEnseignant = async (req, res) => {
     });
 
 };
-
+*/
 //blouer un nouvel utilisateur
 exports.bloquerUser = async (req, res) => {
 
@@ -272,7 +274,8 @@ exports.findAllUserState = async (req, res) => {
         where: {
             RoleId: req.RoleId,
             etat: req.etat
-        }
+        },
+        include: [Faculte, Filiere, Niveau, Specialite, Role]
     });
     if (allUser) {
         return res.json({
@@ -296,7 +299,8 @@ exports.findOneUser = async (req, res) => {
             },
             RoleId: req.RoleId,
             etat: req.etat
-        }
+        },
+        include: [Faculte, Filiere, Niveau, Specialite, Role]
     });
     if (allUser) {
         return res.status(201).json({
@@ -312,9 +316,26 @@ exports.findOneUser = async (req, res) => {
 
 
 //update user by the id in the request
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
+    //check for the unique id
+    const userWithId = await User.findOne({
+        where: {
+            id: req.params.id
+        },
+        //include: [Faculte, Filiere, Niveau, Specialite, Role]
+    })
 
+    
+    if(!userWithId) {
+        return res.status(400).json({
+            success: false,
+            msg: "email pas trouvé",
+        });
+    }
+    userWithId.update({etat: "bloqué"})
 };
+
+
 //delete user with specific id
 exports.delete = (req, res) => {
 

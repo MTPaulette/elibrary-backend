@@ -421,4 +421,11 @@ router.get('/etudiantSupprime/:nom', passport.authenticate('jwt', { session: fal
   }
 });
 
+/**
+ * @route get api/users/updateUser/:id
+ * @desc pour rechercher un etudiant actif par son nom
+ * @access Public
+ */
+router.get('/updateUser/:id', (req, res) => { UserController.update(req, res); });
+
 module.exports = router;

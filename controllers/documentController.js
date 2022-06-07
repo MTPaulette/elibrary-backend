@@ -72,25 +72,6 @@ exports.findOneDocument = async (req, res) => {
     }
 };
 
-//recherche de tous les enseigants bloqués
-exports.findAllDocumentStateActif = async (req, res) => {
-    //check for the unique id
-    const allDocument = await Document.findAll({
-        where: {
-            etat: req.etat
-        }
-    });
-    if (allDocument) {
-        return res.status(201).json({
-            success: true,
-            allDocument: allDocument
-        });
-    } else {
-        return res.status(500).json({
-            success: false
-        });
-    }
-};
 //blouer un nouvel utilisateur
 exports.bloquerDocument = async (req, res) => {
 
@@ -229,7 +210,6 @@ exports.findAllDocumentState = async (req, res) => {
     //check for the unique id
     const allDocument = await Document.findAll({
         where: {
-            RoleId: req.RoleId,
             etat: req.etat
         }
     });
