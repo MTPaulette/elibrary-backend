@@ -426,6 +426,6 @@ router.get('/etudiantSupprime/:nom', passport.authenticate('jwt', { session: fal
  * @desc pour rechercher un etudiant actif par son nom
  * @access Public
  */
-router.get('/updateUser/:id', (req, res) => { UserController.update(req, res); });
+router.post('/updateUser/:id', (req, res) => { UserController.update(req, res); });
 
 module.exports = router;

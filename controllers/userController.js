@@ -60,11 +60,13 @@ exports.login = async (req, res) => {
 //ajouter un nouvel user
 exports.register = async (req, res) => {
     
-    let { username, email, password, confirm_password, FaculteId, FiliereId, NiveauId, SpecialiteId} = req.body
+    let { username, email, password, confirmPassword, FaculteId, FiliereId, NiveauId, SpecialiteId} = req.body
     //check the confirm password
-    if(password !== confirm_password){
+    
+    if(password !== confirmPassword){
         return res.status(400).json({
-            msg: "password do not match."
+            msg: "password do not match.",
+            user: req.body
         });
     }
 
@@ -118,9 +120,9 @@ exports.register = async (req, res) => {
 //ajouter un nouvel user
 exports.registerEnseignant = async (req, res) => {
     
-    let { username, email, password, confirm_password, FaculteId, FiliereId, SpecilaiteId} = req.body
+    let { username, email, password, confirmPassword, FaculteId, FiliereId, SpecilaiteId} = req.body
     //check the confirm password
-    if(password !== confirm_password){
+    if(password !== confirmPassword){
         return res.status(400).json({
             msg: "password do not match."
         });
@@ -317,6 +319,7 @@ exports.findOneUser = async (req, res) => {
 
 //update user by the id in the request
 exports.update = async (req, res) => {
+    let { username, password, newPassword, confirmPassword, FaculteId, FiliereId, NiveauId, SpecialiteId} = req.body
     //check for the unique id
     const userWithId = await User.findOne({
         where: {
@@ -324,15 +327,50 @@ exports.update = async (req, res) => {
         },
         //include: [Faculte, Filiere, Niveau, Specialite, Role]
     })
+        
+    if(password !== userWithId.password){
+        return res.status(400).json({
+            success: false,
+            msg: "password do not match.",
+            user: req.body
+        });
+    }else {
+        if(confirmPassword !== newPassword){
+            return res.status(400).json({
+                success: false,
+                msg: "password do not match.",
+                user: req.body
+            });
+        }
+    }
 
     
     if(!userWithId) {
         return res.status(400).json({
             success: false,
-            msg: "email pas trouvé",
+            msg: "erreur lors de la mise à jour",
+        });
+    }else {    
+
+        let newUser= {
+            //let newUser= new User({
+            username,
+            FaculteId,
+            FiliereId,
+            NiveauId,
+            SpecialiteId
+        };
+
+    if(newPassword) {
+        newUser.password = newPassword
+    }
+        userWithId.update(newUser);
+        return res.status(201).json({
+            success: true,
+            msg: "Profil mis à jour.",
+            user: req.body
         });
     }
-    userWithId.update({etat: "bloqué"})
 };
 
 
