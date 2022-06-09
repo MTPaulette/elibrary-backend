@@ -226,9 +226,8 @@ router.get("/telecharger/:id", async (req, res) => {
  * @access Public
  */
  router.get('/documentActif/:nom' ,(req,res) => {
-    req.RoleId = 2;
     req.etat = 'actif';
-    DocumentController.findOneDocument(req,res);
+    DocumentController.findAllDocumentByName(req,res);
 });
 
 /**

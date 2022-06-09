@@ -1,4 +1,4 @@
-const { Document } = require("../models/index");
+const { Document, Faculte, Filiere, Niveau, Specialite, Type, Ue, User } = require("../models/index");
 const bcrypt = require('bcryptjs');
 
 const { Op } = require("sequelize");
@@ -162,31 +162,6 @@ exports.supprimerDocument = async (req, res) => {
         }
     });
 };
-
-//supprime un nouvel document
-exports.supprimerDocument = async (req, res) => {
-
-    //check for the unique id
-    const documentWithId = await Document.findOne({
-        where: {
-            id: req.params.id
-        }
-    })
-    if(!documentWithId) {
-        return res.status(400).json({
-            success: false,
-            msg: "email pas trouvé",
-        });
-    }
-    documentWithId.update({etat: "supprimé"}).then(document => {
-        return res.status(201).json({
-            success: true,
-            msg: "document supprimé avec success",
-            document_bloqué: document
-        });
-    });
-};
-
 /**
  * =========================================================== gestion de la recherche des utilisateurs===========================================================
  */
@@ -211,7 +186,45 @@ exports.findAllDocumentState = async (req, res) => {
     const allDocument = await Document.findAll({
         where: {
             etat: req.etat
-        }
+        },
+        include: [Faculte, Filiere, Niveau, Specialite, Type, Ue]
+    });
+    if (allDocument) {
+        return res.status(201).json({
+            success: true,
+            allDocument: allDocument
+        });
+    } else {
+        return res.status(500).json({
+            success: false
+        });
+    }
+};
+
+exports.findAllDocumentByName = async (req, res) => {
+    //check for the unique id
+    const allDocument = await Document.findAll({
+        where: {
+            [Op.or]: [
+                {
+                    titre: {
+                        [Op.substring]: req.params.nom,
+                    } 
+                },
+                {
+                    contenu: {
+                        [Op.substring]: req.params.nom,
+                    } 
+                },
+                {
+                    resume: {
+                        [Op.substring]: req.params.nom,
+                    } 
+                },
+            ],
+            etat: req.etat
+        },
+        include: [Faculte, Filiere, Niveau, Specialite, Type, Ue, User]
     });
     if (allDocument) {
         return res.status(201).json({

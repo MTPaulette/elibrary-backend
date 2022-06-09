@@ -56,9 +56,13 @@ app.use('/api/niveaux', niveaux)
 const documents = require('./routes/api/documents');
 app.use('/api/documents', documents)
 
-//bring in the domaines route
+//bring in the ues route
 const ues = require('./routes/api/ues');
 app.use('/api/ues', ues)
+
+//bring in the types route
+const types = require('./routes/api/types');
+app.use('/api/types', types)
 
 //bring in the domaines route
 const domaines = require('./routes/api/domaines');

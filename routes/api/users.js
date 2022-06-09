@@ -176,17 +176,20 @@ router.get('/tousEnseignants', passport.authenticate('jwt', { session: false }),
  */
 
 router.get('/TousEnseignantsActifs', passport.authenticate('jwt', { session: false }), (req, res) => {
-  try {
-    helper.checkPermission(req.user.RoleId, 'touteRecherche').then((rolePerm) => {
-      if (rolePerm) {
+  
         req.RoleId = 2;
         req.etat = 'actif';
         UserController.findAllUserState(req, res);
+  /*
+        try {
+    helper.checkPermission(req.user.RoleId, 'touteRecherche').then((rolePerm) => {
+      if (rolePerm) {
       }
     });
   } catch (err) {
     console.log(err);
   }
+  */
 });
 
 /**
