@@ -315,6 +315,27 @@ exports.findOneUser = async (req, res) => {
         });
     }
 };
+//recherche un utilisateur par son id
+
+exports.findOneUserById = async (req, res) => {
+    //check for the unique id
+    const userWithId = await User.findOne({
+        where: {
+            id: req.params.id
+        },
+        include: [Faculte, Filiere, Niveau, Specialite, Role]
+    })
+    if (userWithId) {
+        return res.status(201).json({
+            success: true,
+            user: userWithId
+        });
+    } else {
+        return res.status(500).json({
+            success: false
+        });
+    }
+};
 
 
 //update user by the id in the request

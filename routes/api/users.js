@@ -150,6 +150,10 @@ router.get('/allUser', passport.authenticate('jwt', { session: false }), (req, r
   }
 });
 
+router.get('/user/:id', (req, res) => {
+        UserController.findOneUserById(req, res);
+});
+
 /** ******************************gestion des enseignants******************************* */
 /**
  * @route get api/users/tousEnseignants
