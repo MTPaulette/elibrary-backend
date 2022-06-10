@@ -226,16 +226,16 @@ exports.findAllDocumentByName = async (req, res) => {
         },
         include: [Faculte, Filiere, Niveau, Specialite, Type, Ue, User]
     });
-    if (allDocument) {
+    if (!allDocument) {
+        return res.json({
+            success: false
+        });
+    }
         return res.status(201).json({
             success: true,
             allDocument: allDocument
         });
-    } else {
-        return res.status(500).json({
-            success: false
-        });
-    }
+    
 };
 
 
