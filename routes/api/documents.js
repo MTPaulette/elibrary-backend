@@ -268,4 +268,9 @@ router.get("/telecharger/:id", async (req, res) => {
     }
 });
 
+
+router.get('/documentOfUser/:id', (req, res) => {
+    DocumentController.findDocumentByUserId(req, res);
+});
+
 module.exports = router;

@@ -239,6 +239,27 @@ exports.findAllDocumentByName = async (req, res) => {
 };
 
 
+//recherche de tous les enseigants bloqués
+exports.findDocumentByUserId = async (req, res) => {
+    //check for the unique id
+    const allDocument = await Document.findAll({
+        where: {
+            UserId: req.params.id
+        },
+        include: [Faculte, Filiere, Niveau, Specialite, Type, Ue, User]
+    });
+    if (allDocument) {
+        return res.status(201).json({
+            success: true,
+            allDocument: allDocument
+        });
+    } else {
+        return res.status(500).json({
+            success: false
+        });
+    }
+};
+
 //update document by the id in the request
 exports.update = (req, res) => {
 
