@@ -22,7 +22,7 @@ router.post('/ajouterEnseignant', passport.authenticate('jwt', { session: false 
   try {
     helper.checkPermission(req.user.RoleId, 'crud_enseignant').then((rolePerm) => {
       if (rolePerm) {
-        UserController.registerEnseignant(req, res);
+        UserController.register(req, res);
       } else {
         return res.status(500).json({
           success: false,
@@ -30,10 +30,6 @@ router.post('/ajouterEnseignant', passport.authenticate('jwt', { session: false 
           rolePerm,
         });
       }
-      return res.status(201).json({
-        success: true,
-        msg: 'teacher registered succefully',
-      });
     });
   } catch (err) {
     console.log(err);

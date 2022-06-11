@@ -58,7 +58,7 @@ exports.login = async (req, res) => {
 };
 
 //ajouter un nouvel user
-exports.register = async (req, res) => {
+exports.registerMarche = async (req, res) => {
     
     let { username, email, password, confirmPassword, FaculteId, FiliereId, NiveauId, SpecialiteId} = req.body
     //check the confirm password
@@ -115,6 +115,77 @@ exports.register = async (req, res) => {
     });
 
 };
+
+// ajouter un nouvel user
+exports.register = async (req, res) => {
+    // exports.registerEnseignant = async (req, res) => {
+    const {
+      username, email, password, confirmPassword, FaculteId, FiliereId, NiveauId, SpecialiteId,
+    } = req.body;
+    // check the confirm password
+    if (password !== confirmPassword) {
+      return res.status(401).json({
+        success: false,
+        msg: 'password do not match.',
+      });
+    }
+  
+    // check for the unique email
+    const userWithEmail = await User.findOne({
+      where: {
+        email,
+      },
+    });
+    if (userWithEmail) {
+      return res.status(401).json({
+        msg: 'this email is already registred. Did you forgot your password?',
+        user: userWithEmail,
+      });
+    }
+  
+    // the data is valid and now we can register the admin
+    const newUser = {
+      // let newUser= new User({
+      username,
+      email,
+      password,
+      FaculteId,
+      FiliereId,
+      NiveauId,
+    };
+
+    if(SpecialiteId) {
+        newUser.SpecialiteId = SpecialiteId
+    }
+  
+    // hash the password
+    bcrypt.genSalt(10, (err, salt) => {
+      if (err) throw err;
+      bcrypt.hash(newUser.password, salt, (error, hash) => {
+        if (error) throw error;
+        newUser.password = hash;
+        User.create(newUser).then((user) => {
+          if (!req.user) {
+            user.setRole(3);
+            return res.status(201).json({
+              success: true,
+              msg: 'user registred successfully',
+              user,
+            });
+          } else if (req.user.RoleId === 1) {
+            user.setUser(1);
+            user.setRole(2);
+            console.log('shjjjjjjjjjjjjjjjjjjjjjjjjjj')
+            return res.status(201).json({
+              success: true,
+              msg: 'user registred successfully',
+              user,
+            });
+          }
+        });
+      });
+    });
+  };
 
 /*
 //ajouter un nouvel user
