@@ -2,7 +2,7 @@ module.exports = {
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'e_library',
+    database: 'eLibrary',
     key: 'yourSecret',
     dialect: 'mysql',
     pool: {
