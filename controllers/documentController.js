@@ -238,6 +238,47 @@ exports.findAllDocumentByName = async (req, res) => {
     
 };
 
+exports.findAllDocumentByUe = async (req, res) => {
+    //check for the unique id
+    const allDocument = await Document.findAll({
+        where: {
+            UeId: req.params.ue,
+            etat: req.etat
+        },
+        include: [Faculte, Filiere, Niveau, Specialite, Type, Ue, User]
+    });
+    if (!allDocument) {
+        return res.json({
+            success: false
+        });
+    }
+        return res.status(201).json({
+            success: true,
+            allDocument: allDocument
+        });
+    
+};
+exports.findAllDocumentByFiliere = async (req, res) => {
+    //check for the unique id
+    const allDocument = await Document.findAll({
+        where: {
+            FiliereId: req.params.filiere,
+            etat: req.etat
+        },
+        include: [Faculte, Filiere, Niveau, Specialite, Type, Ue, User]
+    });
+    if (!allDocument) {
+        return res.json({
+            success: false
+        });
+    }
+        return res.status(201).json({
+            success: true,
+            allDocument: allDocument
+        });
+    
+};
+
 
 //recherche de tous les enseigants bloqués
 exports.findDocumentByUserId = async (req, res) => {

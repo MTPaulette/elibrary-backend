@@ -41,7 +41,23 @@ exports.findByfaculte = async (req, res) => {
 };
 
 //find a single filiere with an id
-exports.findOne = (req, res) => {
+exports.findOne = async (req, res) => {
+
+    const filiere = await Filiere.findOne({
+        where: {
+            id: req.params.id
+        }
+    }); 
+    if (filiere) {
+        return res.status(201).json({
+            success: true,
+            filiere: filiere
+        });
+    } else {
+        return res.status(500).json({
+            success: false
+        });
+    }
     
 };
 

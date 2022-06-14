@@ -230,6 +230,17 @@ router.get("/telecharger/:id", async (req, res) => {
     DocumentController.findAllDocumentByName(req,res);
 });
 
+router.get('/documentActifUe/:ue' ,(req,res) => {
+    req.etat = 'actif';
+    DocumentController.findAllDocumentByUe(req,res);
+});
+
+router.get('/documentActifFiliere/:filiere' ,(req,res) => {
+    req.etat = 'actif';
+    DocumentController.findAllDocumentByFiliere(req,res);
+});
+
+
 /**
  * @route get api/users/documentBloque
  * @desc pour rechercher un document actif par son nom

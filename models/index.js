@@ -125,6 +125,15 @@ myModels.Permission.belongsToMany(myModels.Role, {through: 'PermissionRole'});
 * permission a n ou n role
 */
 
+myModels.Filiere.hasMany(myModels.Ue);
+myModels.Ue.belongsTo(myModels.Filiere);
+
+myModels.Niveau.hasMany(myModels.Ue);
+myModels.Ue.belongsTo(myModels.Niveau);
+
+myModels.Specialite.hasMany(myModels.Ue);
+myModels.Ue.belongsTo(myModels.Specialite);
+
 myModels.Ue.hasMany(myModels.Document);
 myModels.Document.belongsTo(myModels.Ue);
 

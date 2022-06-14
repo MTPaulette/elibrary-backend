@@ -9,5 +9,6 @@ const UeController = require('../../controllers/ueController');
  * @access Public
  */
 router.get('/ues', (req, res) => { UeController.findAll(req, res); });
+router.post('/ues', (req, res) => { UeController.findByFiliereNiveauId(req, res); });
 
 module.exports = router;
