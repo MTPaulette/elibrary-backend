@@ -1,5 +1,5 @@
 module.exports = (sequelize,Sequelize) => {
-    const Signalement = sequelize.define('Signalement', {
+    const Raison = sequelize.define('Raison', {
         id: {
             type: Sequelize.INTEGER,
             autoIncrement: true,
@@ -13,6 +13,6 @@ module.exports = (sequelize,Sequelize) => {
     {
         timestamps: true,
     });
-    return Signalement;
+    return Raison;
 };
 

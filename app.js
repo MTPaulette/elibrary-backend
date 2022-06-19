@@ -36,6 +36,10 @@ const db = require("./models");
 const users = require('./routes/api/users');
 app.use('/api/users', users)
 
+//bring in the raison route
+const raisons = require('./routes/api/raisons');
+app.use('/api/raisons', raisons)
+
 //bring in the faculte route
 const facultes = require('./routes/api/facultes');
 app.use('/api/facultes', facultes)

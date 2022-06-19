@@ -33,7 +33,8 @@ const myModels = {
     Niveau : require('./Niveau')(sequelize,Sequelize),
     Notification : require('./Notification')(sequelize,Sequelize),
     Requete : require('./Requete')(sequelize,Sequelize),
-    Signalement : require('./Requete')(sequelize,Sequelize),
+    Signalement : require('./Signalement')(sequelize,Sequelize),
+    Raison : require('./Raison')(sequelize,Sequelize),
     Specialite : require('./Specialite')(sequelize,Sequelize),
     Ue : require('./Ue')(sequelize,Sequelize),
     User : require('./User')(sequelize,Sequelize),
@@ -193,6 +194,10 @@ myModels.Niveau.belongsToMany(myModels.Specialite, {through: 'filiereNiveau'});
 //document recoit un ou n signalement
 myModels.Document.hasMany(myModels.Signalement);
 myModels.Signalement.belongsTo(myModels.Document);
+
+
+myModels.Raison.hasMany(myModels.Signalement);
+myModels.Signalement.belongsTo(myModels.Raison);
 
 module.exports = myModels;
 
