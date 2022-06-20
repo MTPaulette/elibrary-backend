@@ -74,14 +74,140 @@ app.use('/api/domaines', domaines)
 
 //start server
 const port = process.env.PORT || 5000;
+
+/**
+ * Module dependencies pour le chat
+ */
 const server = app.listen(port, () => console.log('server started on port '+ port));
+const io = require("socket.io")(server);
 
 
-const io = require('socket.io')(server);
 
-io.on('connection', function(socket) {
-    console.log(socket.id)
+io.on('connection', (socket) => {
+    socket.on('login', (user) => {
+        console.log("****************_5555555555555555555555555555555555555555555555555555555555555555555**************")
+        console.log(user)
+        socket.user = user;
+        socket.broadcast.emit('newUser',user)
+    });
     socket.on('SEND_MESSAGE', function(data) {
         io.emit('MESSAGE', data)
     });
+
+  socket.on('disconnect', () => {
+    console.log('someone has left');
+  });
 });
+/*
+var express = require("express");
+var app = express();
+var server = require("http").createServer(app);
+var mongoose = require("mongoose");
+
+const ObjectId = mongoose.Types.ObjectId;
+
+mongoose.connect(
+  "mongodb://localhost/ChatSocket",
+  { useNewUrlParser: true, useUnifiedTopology: true },
+  function (err) {
+    if (err) {
+      console.log(err);
+    } else console.log("Connexion Reussie...");
+  }
+);
+
+var io = require("socket.io")(server);
+
+var connectedUsers = [];
+
+io.on("connection", (socket) => {
+  socket.on("pseudo", (pseudo) => {
+    User.findOne({ pseudo: pseudo }, (err, user) => {
+      if (user) {
+        socket.pseudo = pseudo;
+        socket.broadcast.emit("newUser", pseudo);
+      } else {
+        var user = new User();
+        user.pseudo = pseudo;
+        user.save();
+
+        socket.pseudo = pseudo;
+        socket.broadcast.emit("newUser", pseudo);
+        socket.broadcast.emit("newUserInDb", pseudo);
+      }
+
+      connectedUsers.push(socket);
+      Messages.find({ receiver: "all" }, (err, msg) => {
+        socket.emit("oldMessages", msg);
+      });
+    });
+  });
+
+  socket.on("oldWhispers", (pseudo) => {
+    Messages.find({ receiver: pseudo }, (err, msg) => {
+      if (err) {
+        return false;
+      } else {
+        socket.emit("oldWhispers", msg);
+      }
+    });
+    //.limit(3);
+  });
+
+  socket.on("newMessage", (message, receiver) => {
+    if (receiver === "all") {
+      var messages = new Messages();
+      messages.content = message;
+      messages.sender = socket.pseudo;
+      messages.receiver = "all";
+      messages.save();
+
+      socket.broadcast.emit("newMessageAll", {
+        message: message,
+        pseudo: socket.pseudo,
+      });
+    } else {
+      User.findOne({ pseudo: receiver }, (err, user) => {
+        if (!user) {
+          return false;
+        } else {
+          socketReceiver = connectedUsers.find(
+            (socket) => socket.pseudo === user.pseudo
+          );
+
+          if (socketReceiver) {
+            socketReceiver.emit("whisper", {
+              sender: socket.pseudo,
+              message: message,
+            });
+          }
+
+          var messages = new Messages();
+          messages.content = message;
+          messages.sender = socket.pseudo;
+          messages.receiver = receiver;
+          messages.save();
+        }
+      });
+    }
+  });
+
+  socket.on("writting", (pseudo) => {
+    socket.broadcast.emit("writting", pseudo);
+  });
+
+  socket.on("notWritting", () => {
+    socket.broadcast.emit("notWritting");
+  });
+
+  socket.on("disconnect", () => {
+    var index = connectedUsers.indexOf(socket);
+    if (index > -1) {
+      connectedUsers.splice(index, 1);
+    }
+    socket.broadcast.emit("quitUser", socket.pseudo);
+  });
+});
+*/
+
+// const server = app.listen(port, () => console.log('server started on port '+ port));
