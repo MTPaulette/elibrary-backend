@@ -5,10 +5,6 @@ module.exports = (sequelize,Sequelize) => {
             autoIncrement: true,
             primaryKey: true
         },
-        message: {
-            type: Sequelize.TEXT,
-            allowNull: false
-        },
     },
     {
         timestamps: true,

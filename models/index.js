@@ -32,8 +32,8 @@ const myModels = {
     Filiere : require('./Filiere')(sequelize,Sequelize),
     Niveau : require('./Niveau')(sequelize,Sequelize),
     Notification : require('./Notification')(sequelize,Sequelize),
+    Message : require('./Message')(sequelize,Sequelize),
     Requete : require('./Requete')(sequelize,Sequelize),
-    Discussion : require('./Discussion')(sequelize,Sequelize),
     Signalement : require('./Signalement')(sequelize,Sequelize),
     Raison : require('./Raison')(sequelize,Sequelize),
     Specialite : require('./Specialite')(sequelize,Sequelize),
@@ -201,18 +201,26 @@ myModels.Raison.hasMany(myModels.Signalement);
 myModels.Signalement.belongsTo(myModels.Raison);
 
 
+myModels.User.hasMany(myModels.Message);
+myModels.Message.belongsTo(myModels.User);
+
+
+myModels.Requete.hasMany(myModels.Message);
+myModels.Message.belongsTo(myModels.Requete);
+
+//discussion a un emmetteur et un recepteur
+// myModels.User.hasOne(myModels.Requete, {  as: 'UserSender', foreignKey: 'UserSenderId'});
+// myModels.User.hasOne(myModels.Requete, { as: 'UserReceiver', foreignKey: 'UserReceiverId'});
+// myModels.Requete.belongsTo(myModels.User);
+
+
+myModels.User.hasMany(myModels.Requete, {  as: 'UserSender', foreignKey: 'UserSenderId'});
 myModels.User.hasMany(myModels.Requete);
 myModels.Requete.belongsTo(myModels.User);
 
-
-myModels.Discussion.hasMany(myModels.Requete);
-myModels.Requete.belongsTo(myModels.Discussion);
-
-//discussion a un emmetteur et un recepteur
-myModels.User.hasMany(myModels.Discussion, { foreignKey: 'UserSenderId'});
-myModels.User.hasMany(myModels.Discussion, { foreignKey: 'UserReceiverId'});
-//myModels.Discussion.belongsTo(myModels.User);
-
+// Team.hasOne(Game, { as: 'HomeTeam', foreignKey: 'homeTeamId' });
+// Team.hasOne(Game, { as: 'AwayTeam', foreignKey: 'awayTeamId' });
+// Game.belongsTo(Team);
 module.exports = myModels;
 
  

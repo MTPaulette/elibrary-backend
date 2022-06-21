@@ -1,17 +1,27 @@
-const { Server } = require('socket.io');
 
-const io = new Server({
-  cors: {
-    origin: 'http://localhost:8080/login',
-  },
-});
+/**
+ * Module dependencies pour le chat
+ */
 
-io.on('connection', (socket) => {
-  console.log('someone has connected!');
 
-  socket.on('disconnect', () => {
-    console.log('someone has left');
+
+module.exports = (server) => {
+  const io = require("socket.io")(server);
+  global.io = io;
+
+
+  io.on('connection', function (socket) {
+    console.log("****************_5555555555555555555555555555555555555555555555555555555555555555555**************");
+    console.log(socket.id);
+    //console.log(socket.client.request.headers.UserId);
+
+    socket.on('SEND_MESSAGE', function (data) {
+      console.log(data);
+      io.emit('MESSAGE', data)
+    });
+    socket.on('disconnect', () => {
+      console.log('someone has left');
+    });
   });
-});
 
-io.listen(5000);
+}

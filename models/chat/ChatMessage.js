@@ -25,7 +25,7 @@ const chatMessageSchema = new mongoose.Schema(
       type: String,
       default: () => uuidv4().replace(/\-/g, ""),
     },
-    chatRoomId: String,
+    requeteId: String,
     message: mongoose.Schema.Types.Mixed,
     type: {
       type: String,
@@ -47,10 +47,10 @@ const chatMessageSchema = new mongoose.Schema(
  * @param {Object} message - message you want to post in the chat room
  * @param {String} postedByUser - user who is posting the message
  */
-chatMessageSchema.statics.createPostInChatRoom = async function (chatRoomId, message, postedByUser) {
+chatMessageSchema.statics.createPostInRequete = async function (requeteId, message, postedByUser) {
   try {
     const post = await this.create({
-      chatRoomId,
+      requeteId,
       message,
       postedByUser,
       readByRecipients: { readByUserId: postedByUser }
@@ -70,39 +70,39 @@ chatMessageSchema.statics.createPostInChatRoom = async function (chatRoomId, mes
       },
       { $unwind: '$postedByUser' },
       // do a join on another table called chatrooms, and 
-      // get me a chatroom whose _id = chatRoomId
+      // get me a chatroom whose _id = requeteId
       {
         $lookup: {
           from: 'chatrooms',
-          localField: 'chatRoomId',
+          localField: 'requeteId',
           foreignField: '_id',
-          as: 'chatRoomInfo',
+          as: 'requeteInfo',
         }
       },
-      { $unwind: '$chatRoomInfo' },
-      { $unwind: '$chatRoomInfo.userIds' },
+      { $unwind: '$requeteInfo' },
+      { $unwind: '$requeteInfo.userIds' },
       // do a join on another table called users, and 
       // get me a user whose _id = userIds
       {
         $lookup: {
           from: 'users',
-          localField: 'chatRoomInfo.userIds',
+          localField: 'requeteInfo.userIds',
           foreignField: '_id',
-          as: 'chatRoomInfo.userProfile',
+          as: 'requeteInfo.userProfile',
         }
       },
-      { $unwind: '$chatRoomInfo.userProfile' },
+      { $unwind: '$requeteInfo.userProfile' },
       // group data
       {
         $group: {
-          _id: '$chatRoomInfo._id',
+          _id: '$requeteInfo._id',
           postId: { $last: '$_id' },
-          chatRoomId: { $last: '$chatRoomInfo._id' },
+          requeteId: { $last: '$requeteInfo._id' },
           message: { $last: '$message' },
           type: { $last: '$type' },
           postedByUser: { $last: '$postedByUser' },
           readByRecipients: { $last: '$readByRecipients' },
-          chatRoomInfo: { $addToSet: '$chatRoomInfo.userProfile' },
+          requeteInfo: { $addToSet: '$requeteInfo.userProfile' },
           createdAt: { $last: '$createdAt' },
           updatedAt: { $last: '$updatedAt' },
         }
@@ -115,12 +115,12 @@ chatMessageSchema.statics.createPostInChatRoom = async function (chatRoomId, mes
 }
 
 /**
- * @param {String} chatRoomId - chat room id
+ * @param {String} requeteId - chat room id
  */
-chatMessageSchema.statics.getConversationByRoomId = async function (chatRoomId, options = {}) {
+chatMessageSchema.statics.getConversationByRequeteId = async function (requeteId, options = {}) {
   try {
     return this.aggregate([
-      { $match: { chatRoomId } },
+      { $match: { requeteId } },
       { $sort: { createdAt: -1 } },
       // do a join on another table called users, and 
       // get me a user whose _id = postedByUser
@@ -144,14 +144,14 @@ chatMessageSchema.statics.getConversationByRoomId = async function (chatRoomId, 
 }
 
 /**
- * @param {String} chatRoomId - chat room id
+ * @param {String} requeteId - chat room id
  * @param {String} currentUserOnlineId - user id
  */
-chatMessageSchema.statics.markMessageRead = async function (chatRoomId, currentUserOnlineId) {
+chatMessageSchema.statics.markMessageRead = async function (requeteId, currentUserOnlineId) {
   try {
     return this.updateMany(
       {
-        chatRoomId,
+        requeteId,
         'readByRecipients.readByUserId': { $ne: currentUserOnlineId }
       },
       {
@@ -169,19 +169,19 @@ chatMessageSchema.statics.markMessageRead = async function (chatRoomId, currentU
 }
 
 /**
- * @param {Array} chatRoomIds - chat room ids
+ * @param {Array} requeteIds - chat room ids
  * @param {{ page, limit }} options - pagination options
  * @param {String} currentUserOnlineId - user id
  */
-chatMessageSchema.statics.getRecentConversation = async function (chatRoomIds, options, currentUserOnlineId) {
+chatMessageSchema.statics.getRecentConversation = async function (requeteIds, options, currentUserOnlineId) {
   try {
     return this.aggregate([
-      { $match: { chatRoomId: { $in: chatRoomIds } } },
+      { $match: { requeteId: { $in: requeteIds } } },
       {
         $group: {
-          _id: '$chatRoomId',
+          _id: '$requeteId',
           messageId: { $last: '$_id' },
-          chatRoomId: { $last: '$chatRoomId' },
+          requeteId: { $last: '$requeteId' },
           message: { $last: '$message' },
           type: { $last: '$type' },
           postedByUser: { $last: '$postedByUser' },
@@ -237,7 +237,7 @@ chatMessageSchema.statics.getRecentConversation = async function (chatRoomIds, o
         $group: {
           _id: '$roomInfo._id',
           messageId: { $last: '$messageId' },
-          chatRoomId: { $last: '$chatRoomId' },
+          requeteId: { $last: '$requeteId' },
           message: { $last: '$message' },
           type: { $last: '$type' },
           postedByUser: { $last: '$postedByUser' },

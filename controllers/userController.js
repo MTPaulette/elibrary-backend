@@ -187,64 +187,6 @@ exports.register = async (req, res) => {
     });
   };
 
-/*
-//ajouter un nouvel user
-exports.registerEnseignant = async (req, res) => {
-    
-    let { username, email, password, confirmPassword, FaculteId, FiliereId, SpecilaiteId} = req.body
-    //check the confirm password
-    if(password !== confirmPassword){
-        return res.status(400).json({
-            msg: "password do not match."
-        });
-    }
-
-    //check for the unique email
-    const userWithEmail = await User.findOne ({
-        where: {
-            email: email
-        }
-    })
-    if(userWithEmail) {
-        return res.status(400).json({
-            msg: "this email is already registred. Did you forgot your password?",
-            user: userWithEmail
-        });
-    }
-
-    //the data is valid and now we can register the admin
-    let newUser= {
-        //let newUser= new User({
-        username,
-        email,
-        password
-    };
-    
-    //hash the password
-    bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(newUser.password, salt, (err, hash) => {
-            if(err) throw err;
-            newUser.password = hash;
-            User.create(newUser).then(user => {
-                if(!req.user) {
-                    user.setRole(3);
-                }else {
-                    if(req.user.RoleId == 1) {
-                        user.setUser(1);
-                        user.setRole(2);
-                    }
-                }
-                return res.status(201).json({
-                    success: true,
-                    msg: "user registred successfully",
-                    user: user
-                });
-            });
-        });
-    });
-
-};
-*/
 //blouer un nouvel utilisateur
 exports.bloquerUser = async (req, res) => {
 

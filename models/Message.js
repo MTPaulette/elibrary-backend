@@ -1,14 +1,18 @@
 module.exports = (sequelize,Sequelize) => {
-    const Discussion = sequelize.define('Discussion', {
+    const Message = sequelize.define('Message', {
         id: {
             type: Sequelize.INTEGER,
             autoIncrement: true,
             primaryKey: true
         },
+        contenu: {
+            type: Sequelize.TEXT,
+            allowNull: false
+        },
     },
     {
         timestamps: true,
     });
-    return Discussion;
+    return Message;
 };
 
