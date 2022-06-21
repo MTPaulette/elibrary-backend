@@ -5,6 +5,34 @@ const { User, Requete, Message } = require("./../../models/index");
 //let io = require("./../../io")
 
 const { Op } = require("sequelize");
+
+//create new request conversation
+exports.createConversation = async (req, res) => {
+  console.log("***************************")
+  console.log(req.body)
+    //check for the unique id
+    const requete = await Requete.findOrCreate({
+        where: {
+          UserSenderId: req.user.id,
+          UserId: req.body.userReceiverId,
+          DocumentId: req.body.documentId
+        },
+      //include: [{ model: User, as: 'UserReceiver' }]
+
+        include: { all:true }
+    });
+  if (requete) {
+      global.io.emit('NEW_REQUETE', requete )
+        return res.status(201).json({
+            success: true,
+            requete
+        });
+    } else {
+        return res.status(500).json({
+            success: false
+        });
+    }
+  },
 exports.postMessage = async (req, res) => {
   try {
     
@@ -31,20 +59,29 @@ exports.postMessage = async (req, res) => {
 },
 
 //find all recent request conversation
-exports.getRecentConversation = async (req, res) => {  
+exports.getRecentConversation = async (req, res) => {
+  console.log(".........................")
+  console.log(req.user.id)
     //check for the unique id
     const requetes = await Requete.findAll({
         where: {
-            UserSenderId: req.user.id
+            [Op.or]: [
+            {
+              UserSenderId: req.user.id
+            },
+            {
+              UserId: req.user.id
+            },
+            ],
         },
       //include: [{ model: User, as: 'UserReceiver' }]
 
         include: { all:true }
-        //include: [ UserSender, UserReceiver]
     });
   if (requetes) {
       //global.io.emit('ALL_REQUETE', { requetes: allRequete })
       //global.io.emit('ALL_REQUETE', requetes )
+    console.log(requetes)
         return res.status(201).json({
             success: true,
             requetes

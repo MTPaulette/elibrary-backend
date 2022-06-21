@@ -218,6 +218,9 @@ myModels.User.hasMany(myModels.Requete, {  as: 'UserSender', foreignKey: 'UserSe
 myModels.User.hasMany(myModels.Requete);
 myModels.Requete.belongsTo(myModels.User);
 
+myModels.Document.hasMany(myModels.Requete);
+myModels.Requete.belongsTo(myModels.Document);
+
 // Team.hasOne(Game, { as: 'HomeTeam', foreignKey: 'homeTeamId' });
 // Team.hasOne(Game, { as: 'AwayTeam', foreignKey: 'awayTeamId' });
 // Game.belongsTo(Team);
