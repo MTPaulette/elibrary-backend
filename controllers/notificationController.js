@@ -1,4 +1,6 @@
 const { Notification, User, Filiere } = require("../models/index");
+
+const { Op } = require("sequelize");
 /**
  * =========================================================== gestion des utilisateurs ======================================================
  */
@@ -55,8 +57,14 @@ exports.findAll = (req, res) => {
     } else {
         Notification.findAll({
             where: {
-                FiliereId : req.user.FiliereId,
+            [Op.or]: [
+                {
                 FiliereId : null,
+                },
+                {
+                FiliereId : req.user.FiliereId,
+                },
+            ],
             },
             include: [User, Filiere]
         }).then(notifications => {

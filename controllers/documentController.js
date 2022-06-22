@@ -1,6 +1,4 @@
 const { Document, Faculte, Filiere, Niveau, Specialite, Type, Ue, User } = require("../models/index");
-const bcrypt = require('bcryptjs');
-
 const { Op } = require("sequelize");
 /**
  * =========================================================== gestion des utilisateurs ======================================================
