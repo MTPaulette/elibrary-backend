@@ -7,7 +7,7 @@ module.exports = (sequelize,Sequelize) => {
         },
         description: {
             type: Sequelize.TEXT,
-            allowNull: false
+            allowNull: true
         },
     },
     {

@@ -8,14 +8,21 @@ const { Op } = require("sequelize");
 
 //create new request conversation
 exports.createConversation = async (req, res) => {
-  console.log("***************************")
-  console.log(req.body)
-    //check for the unique id
+  
     const requete = await Requete.findOrCreate({
         where: {
-          UserSenderId: req.user.id,
-          UserId: req.body.userReceiverId,
-          DocumentId: req.body.documentId
+          [Op.or]: [
+            {
+              UserReceiverId: req.user.id,
+              UserSenderId: req.body.userReceiverId,
+              DocumentId: req.body.documentId
+            },
+            {
+              UserSenderId: req.user.id,
+              UserReceiverId: req.body.userReceiverId,
+              DocumentId: req.body.documentId
+            },
+          ],
         },
       //include: [{ model: User, as: 'UserReceiver' }]
 
@@ -46,7 +53,10 @@ exports.postMessage = async (req, res) => {
     Message.create(message).then(message => {
       message.setUser(req.user);
       message.setRequete(requeteId);
-      global.io.emit('NEW_MESSAGE', message);
+
+      global.io.to(requeteId).emit('NEW_MESSAGE', message);
+      // global.io.emit('NEW_MESSAGE', message);
+
       return res.status(201).json({
         success: true,
         msg: "message registred successfully",
@@ -60,9 +70,6 @@ exports.postMessage = async (req, res) => {
 
 //find all recent request conversation
 exports.getRecentConversation = async (req, res) => {
-  console.log(".........................")
-  console.log(req.user.id)
-    //check for the unique id
     const requetes = await Requete.findAll({
         where: {
             [Op.or]: [
@@ -70,7 +77,7 @@ exports.getRecentConversation = async (req, res) => {
               UserSenderId: req.user.id
             },
             {
-              UserId: req.user.id
+              UserReceiverId: req.user.id
             },
             ],
         },
@@ -79,8 +86,6 @@ exports.getRecentConversation = async (req, res) => {
         include: { all:true }
     });
   if (requetes) {
-      //global.io.emit('ALL_REQUETE', { requetes: allRequete })
-      //global.io.emit('ALL_REQUETE', requetes )
     console.log(requetes)
         return res.status(201).json({
             success: true,

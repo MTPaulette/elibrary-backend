@@ -72,7 +72,13 @@ app.use('/api/types', types)
 const domaines = require('./routes/api/domaines');
 app.use('/api/domaines', domaines)
 
+//bring in the signalements route
+const signalements = require('./routes/api/signalements');
+app.use('/api/signalements', signalements)
 
+//bring in the notifications route
+const notifications = require('./routes/api/notifications');
+app.use('/api/notifications', notifications)
 /**
  * route for chat fonctionnalities
  */
@@ -86,6 +92,11 @@ const port = process.env.PORT || 5000;
 
 const server = app.listen(port, () => console.log('server started on port '+ port));
 require("./socket")(server);
+
+// const socketio = require("socket.io")(server);
+
+// global.io = socketio;
+// global.io.on('connection',  require("./WebSockets").connection)
 
 
 // const server = app.listen(port, () => console.log('server started on port '+ port));
