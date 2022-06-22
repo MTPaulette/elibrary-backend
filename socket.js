@@ -1,17 +1,42 @@
-const { Server } = require("socket.io");
 
-const io = new Server({ 
-    cors: {
-        origin: "http://localhost:8080/login"
-    }
-});
+/**
+ * Module dependencies pour le chat
+ */
 
-io.on("connection", (socket) => {
-  console.log("someone has connected!");
+/*
+module.exports = (server) => {
+  const io = require("socket.io")(server);
 
-  socket.on("disconnect", () => {
-      console.log("someone has left")
-  })
-});
+  io.on('connection', function (socket) {
+    console.log("****************_5555555555555555555555555555555555555555555555555555555555555555555**************");
+    console.log(socket.id);
+  global.io = socket.join("requete");
 
-io.listen(5000);
+    socket.on('disconnect', () => {
+      console.log('someone has left');
+    });
+  });
+
+}
+*/
+module.exports = (server) => {
+  const io = require("socket.io")(server);
+  global.io = io;
+
+
+  io.on('connection', function (socket) {
+    //console.log(socket.id);
+
+    socket.on('SELECTED_REQUETE', function (requeteId) {
+      console.log("****************_5555555555555555555555555555555555555555555555555555555555555555555**************");
+      console.log(requeteId)
+    //console.log(socket.id);
+      socket.join(requeteId);
+    })
+
+    socket.on('disconnect', () => {
+      console.log('someone has left');
+    });
+  });
+
+}

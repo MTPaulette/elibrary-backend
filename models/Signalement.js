@@ -5,9 +5,9 @@ module.exports = (sequelize,Sequelize) => {
             autoIncrement: true,
             primaryKey: true
         },
-        contenu: {
+        description: {
             type: Sequelize.TEXT,
-            allowNull: false
+            allowNull: true
         },
     },
     {

@@ -32,8 +32,10 @@ const myModels = {
     Filiere : require('./Filiere')(sequelize,Sequelize),
     Niveau : require('./Niveau')(sequelize,Sequelize),
     Notification : require('./Notification')(sequelize,Sequelize),
+    Message : require('./Message')(sequelize,Sequelize),
     Requete : require('./Requete')(sequelize,Sequelize),
-    Signalement : require('./Requete')(sequelize,Sequelize),
+    Signalement : require('./Signalement')(sequelize,Sequelize),
+    Raison : require('./Raison')(sequelize,Sequelize),
     Specialite : require('./Specialite')(sequelize,Sequelize),
     Ue : require('./Ue')(sequelize,Sequelize),
     User : require('./User')(sequelize,Sequelize),
@@ -44,42 +46,6 @@ const myModels = {
     PermissionRole : require('./PermissionRole')(sequelize,Sequelize),
 };
 
-/**
- * module admin
- */
-/*
-//admin cree un ou n enseignant
-myModels.Admin.hasMany(myModels.Enseignant);
-myModels.Enseignant.belongsTo(myModels.Admin);
-
-//admin ajoute un ou n domain
-myModels.Admin.hasMany(myModels.Domaine, { foreignKey: {name:'idAdminAjouteur'}});
-myModels.Domaine.belongsTo(myModels.Admin);
-
-//admin bloque un ou n etudiant
-myModels.Admin.hasMany(myModels.Etudiant, { foreignKey: {name:'AdminBloqueurId'}});
-myModels.Etudiant.belongsTo(myModels.Admin);
-
-//admin envoye et recevoir un ou n notification
-myModels.Admin.hasMany(myModels.Notification, { foreignKey: 'idAdminEnvoyeur'});
-myModels.Admin.hasMany(myModels.Notification, { foreignKey: 'idAdminReceveur'});
-myModels.Notification.belongsTo(myModels.Admin);
-
-//admin bloque et debloque un ou n livre
-myModels.Admin.hasMany(myModels.Livre, { foreignKey: 'idAdminEnvoyeur'});
-myModels.Admin.hasMany(myModels.Livre, { foreignKey: 'idAdminReceveur'});
-myModels.Livre.belongsTo(myModels.Admin);
-
-//admin envoye et recevoir un ou n notification
-myModels.Admin.hasMany(myModels.Notification, { foreignKey: 'idAdminBloqueur'});
-myModels.Admin.hasMany(myModels.Notification, { foreignKey: 'idAdminDebloqueur'});
-myModels.Notification.belongsTo(myModels.Admin);
-
-//admin envoye et recevoir un ou n notification
-myModels.Admin.hasMany(myModels.Notification, { foreignKey: 'idAdminBloqueur'});
-myModels.Admin.hasMany(myModels.Notification, { foreignKey: 'idAdminDebloqueur'});
-myModels.Notification.belongsTo(myModels.Admin);
-*/
 
 /******************************************** user et faculte, filiere, specialite*************************************************** */
 
@@ -124,6 +90,18 @@ myModels.Permission.belongsToMany(myModels.Role, {through: 'PermissionRole'});
 * role a un ou n user
 * permission a n ou n role
 */
+
+myModels.Filiere.hasMany(myModels.Ue);
+myModels.Ue.belongsTo(myModels.Filiere);
+
+myModels.Niveau.hasMany(myModels.Ue);
+myModels.Ue.belongsTo(myModels.Niveau);
+
+myModels.Specialite.hasMany(myModels.Ue);
+myModels.Ue.belongsTo(myModels.Specialite);
+
+myModels.Ue.hasMany(myModels.Document);
+myModels.Document.belongsTo(myModels.Ue);
 
 myModels.User.hasMany(myModels.Document);
 myModels.Document.belongsTo(myModels.User);
@@ -177,10 +155,49 @@ myModels.Niveau.belongsToMany(myModels.Filiere, {through: 'filiereNiveau'});
 //specialite a n ou n Niveau
 myModels.Specialite.belongsToMany(myModels.Niveau, {through: 'filiereNiveau'});
 myModels.Niveau.belongsToMany(myModels.Specialite, {through: 'filiereNiveau'});
-
+/**
+ * signalement
+ */
 //document recoit un ou n signalement
 myModels.Document.hasMany(myModels.Signalement);
 myModels.Signalement.belongsTo(myModels.Document);
+
+//user fait un ou n signalement
+myModels.User.hasMany(myModels.Signalement);
+myModels.Signalement.belongsTo(myModels.User);
+
+myModels.Raison.hasMany(myModels.Signalement);
+myModels.Signalement.belongsTo(myModels.Raison);
+
+/**
+ * Notification
+ */
+myModels.User.hasMany(myModels.Notification);
+myModels.Notification.belongsTo(myModels.User);
+
+myModels.Filiere.hasMany(myModels.Notification);
+myModels.Notification.belongsTo(myModels.Filiere);
+
+/**
+ * requete et message
+ */
+myModels.User.hasMany(myModels.Message);
+myModels.Message.belongsTo(myModels.User);
+
+
+myModels.Requete.hasMany(myModels.Message);
+myModels.Message.belongsTo(myModels.Requete);
+
+myModels.Document.hasMany(myModels.Requete);
+myModels.Requete.belongsTo(myModels.Document);
+
+
+
+myModels.User.hasMany(myModels.Requete, {  as: 'UserSender', foreignKey: 'UserSenderId'});
+myModels.User.hasMany(myModels.Requete, {  as: 'UserReceiverId', foreignKey: 'UserReceiverId'});
+myModels.Requete.belongsTo(myModels.User, { as: 'UserSender', foreignKey: 'UserSenderId'});
+myModels.Requete.belongsTo(myModels.User, { as: 'UserReceiver', foreignKey: 'UserReceiverId'});
+
 
 module.exports = myModels;
 

@@ -1,6 +1,4 @@
-const { Document } = require("../models/index");
-const bcrypt = require('bcryptjs');
-
+const { Document, Faculte, Filiere, Niveau, Specialite, Type, Ue, User } = require("../models/index");
 const { Op } = require("sequelize");
 /**
  * =========================================================== gestion des utilisateurs ======================================================
@@ -9,14 +7,14 @@ const { Op } = require("sequelize");
 //ajouter un nouvel document
 exports.createDocument = async (req, res) => {
     let { titre, resume, auteur, type, FaculteId, FiliereId, NiveauId, SpecialiteId} = req.body;
-
     //the data is valid and now we can register the admin
+    
     let newDocument= {
         titre,
         resume,
         auteur,
         type,
-        contenu: req.file.path,
+        contenu: req.file.originalname,
         FaculteId,
         FiliereId,
         NiveauId,
@@ -47,8 +45,29 @@ exports.createDocument = async (req, res) => {
             });
 
         }
+        
     });
   //});
+};
+
+//recherche de tous les enseigants bloqués
+exports.findOneDocument = async (req, res) => {
+    //check for the unique id
+    const allDocument = await Document.findByPk({
+        where: {
+            id: req.params.id,
+        }
+    });
+    if (allDocument) {
+        return res.status(201).json({
+            success: true,
+            document: download()
+        });
+    } else {
+        return res.status(500).json({
+            success: false
+        });
+    }
 };
 
 //blouer un nouvel utilisateur
@@ -141,31 +160,6 @@ exports.supprimerDocument = async (req, res) => {
         }
     });
 };
-
-//supprime un nouvel document
-exports.supprimerDocument = async (req, res) => {
-
-    //check for the unique id
-    const documentWithId = await Document.findOne({
-        where: {
-            id: req.params.id
-        }
-    })
-    if(!documentWithId) {
-        return res.status(400).json({
-            success: false,
-            msg: "email pas trouvé",
-        });
-    }
-    documentWithId.update({etat: "supprimé"}).then(document => {
-        return res.status(201).json({
-            success: true,
-            msg: "document supprimé avec success",
-            document_bloqué: document
-        });
-    });
-};
-
 /**
  * =========================================================== gestion de la recherche des utilisateurs===========================================================
  */
@@ -185,32 +179,13 @@ exports.findAllDocument = async (req, res) => {
 };
 
 //recherche de tous les enseigants bloqués
-exports.findAllDocumentStateActif = async (req, res) => {
-    //check for the unique id
-    const allDocument = await Document.findAll({
-        where: {
-            etat: req.etat
-        }
-    });
-    if (allDocument) {
-        return res.status(201).json({
-            success: true,
-            allDocument: allDocument
-        });
-    } else {
-        return res.status(500).json({
-            success: false
-        });
-    }
-};
-//recherche de tous les enseigants bloqués
 exports.findAllDocumentState = async (req, res) => {
     //check for the unique id
     const allDocument = await Document.findAll({
         where: {
-            RoleId: req.RoleId,
             etat: req.etat
-        }
+        },
+        include: [Faculte, Filiere, Niveau, Specialite, Type, Ue]
     });
     if (allDocument) {
         return res.status(201).json({
@@ -224,17 +199,93 @@ exports.findAllDocumentState = async (req, res) => {
     }
 };
 
-//recherche de tous les enseigants bloqués
-exports.findOneDocument = async (req, res) => {
+exports.findAllDocumentByName = async (req, res) => {
     //check for the unique id
     const allDocument = await Document.findAll({
         where: {
-            nom: {
-                [Op.substring]: req.params.nom,
-            },
-            RoleId: req.RoleId,
+            [Op.or]: [
+                {
+                    titre: {
+                        [Op.substring]: req.params.nom,
+                    } 
+                },
+                {
+                    contenu: {
+                        [Op.substring]: req.params.nom,
+                    } 
+                },
+                {
+                    resume: {
+                        [Op.substring]: req.params.nom,
+                    } 
+                },
+            ],
             etat: req.etat
-        }
+        },
+        include: [Faculte, Filiere, Niveau, Specialite, Type, Ue, User]
+    });
+    if (!allDocument) {
+        return res.json({
+            success: false
+        });
+    }
+        return res.status(201).json({
+            success: true,
+            allDocument: allDocument
+        });
+    
+};
+
+exports.findAllDocumentByUe = async (req, res) => {
+    //check for the unique id
+    const allDocument = await Document.findAll({
+        where: {
+            UeId: req.params.ue,
+            etat: req.etat
+        },
+        include: [Faculte, Filiere, Niveau, Specialite, Type, Ue, User]
+    });
+    if (!allDocument) {
+        return res.json({
+            success: false
+        });
+    }
+        return res.status(201).json({
+            success: true,
+            allDocument: allDocument
+        });
+    
+};
+exports.findAllDocumentByFiliere = async (req, res) => {
+    //check for the unique id
+    const allDocument = await Document.findAll({
+        where: {
+            FiliereId: req.params.filiere,
+            etat: req.etat
+        },
+        include: [Faculte, Filiere, Niveau, Specialite, Type, Ue, User]
+    });
+    if (!allDocument) {
+        return res.json({
+            success: false
+        });
+    }
+        return res.status(201).json({
+            success: true,
+            allDocument: allDocument
+        });
+    
+};
+
+
+//recherche de tous les enseigants bloqués
+exports.findDocumentByUserId = async (req, res) => {
+    //check for the unique id
+    const allDocument = await Document.findAll({
+        where: {
+            UserId: req.params.id
+        },
+        include: [Faculte, Filiere, Niveau, Specialite, Type, Ue, User]
     });
     if (allDocument) {
         return res.status(201).json({
@@ -247,7 +298,6 @@ exports.findOneDocument = async (req, res) => {
         });
     }
 };
-
 
 //update document by the id in the request
 exports.update = (req, res) => {

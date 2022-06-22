@@ -4,19 +4,21 @@ const path = require('path');
 const passport = require('passport');
 const cors = require('cors');
 
-
 //initialize the app
 const app = express();
+app.use(express.json());
+
+app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(bodyParser.json());
 app.use(cors());
+
 //json middleware
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-//configuration the static directory
-app.use(express.static(path.join(__dirname, 'public')));
 
 //use the passport middleware
 app.use(passport.initialize());
@@ -33,6 +35,10 @@ const db = require("./models");
 //bring in the Users route
 const users = require('./routes/api/users');
 app.use('/api/users', users)
+
+//bring in the raison route
+const raisons = require('./routes/api/raisons');
+app.use('/api/raisons', raisons)
 
 //bring in the faculte route
 const facultes = require('./routes/api/facultes');
@@ -54,49 +60,43 @@ app.use('/api/niveaux', niveaux)
 const documents = require('./routes/api/documents');
 app.use('/api/documents', documents)
 
+//bring in the ues route
+const ues = require('./routes/api/ues');
+app.use('/api/ues', ues)
+
+//bring in the types route
+const types = require('./routes/api/types');
+app.use('/api/types', types)
+
 //bring in the domaines route
 const domaines = require('./routes/api/domaines');
 app.use('/api/domaines', domaines)
 
+//bring in the signalements route
+const signalements = require('./routes/api/signalements');
+app.use('/api/signalements', signalements)
 
-/***************************************************************************************** chat ***************************************************************************************** */
-/*
-const http = require("http");
-const logger = require("morgan");
-const socketio = require("socket.io");
+//bring in the notifications route
+const notifications = require('./routes/api/notifications');
+app.use('/api/notifications', notifications)
+/**
+ * route for chat fonctionnalities
+ */
 
-// socket configuration
-const WebSockets = require("./utils/WebSockets.js");
-
-// routes
-const indexRouter = require("./routes/api/chat/index");
-const userRouter = require("./routes/api/chat/user");
-const chatRoomRouter = require("./routes/api/chat/chatRoom");
-const deleteRouter = require("./routes/api/chat/delete");
-
-app.use(logger("dev"));
-
-app.use("/", indexRouter);
-app.use("/users", userRouter);
-app.use("/room", decode, chatRoomRouter);
-app.use("/delete", deleteRouter);
-
-/** Create HTTP server. */
-//const server = http.createServer(app);
-/** Create socket connection */
-/*
-global.io = socketio.listen(server);
-global.io.on('connection', WebSockets.connection)
-*/
-
-/** catch 404 and forward to error handler */
-app.use('*', (req, res) => {
-  return res.status(404).json({
-    success: false,
-    message: 'API endpoint doesnt exist'
-  })
-});
+//bring in the requete route
+const requetes = require('./routes/api/chat/requetes');
+app.use('/api/chat/requetes', requetes)
 
 //start server
 const port = process.env.PORT || 5000;
-app.listen(port, () => console.log('server started on port '+ port));
+
+const server = app.listen(port, () => console.log('server started on port '+ port));
+require("./socket")(server);
+
+// const socketio = require("socket.io")(server);
+
+// global.io = socketio;
+// global.io.on('connection',  require("./WebSockets").connection)
+
+
+// const server = app.listen(port, () => console.log('server started on port '+ port));

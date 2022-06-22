@@ -2,13 +2,17 @@ const express = require('express');
 const router = express.Router();
 const path = require("path");
 const passport = require('passport');
+
 const DocumentController = require('../../controllers/documentController');
+const Document = require('../../models').Document;
+
 const helper = require('../../utils/helper.js');
 const multer = require("multer");
 
 const app = express();
 
     app.use(express.static(`${__dirname}/public`));
+    // __dirname + '../../../public/upload/'
     //Configuration for Multer
     const multerStorage = multer.diskStorage({
         destination: (req, file, cb) => {
@@ -16,8 +20,8 @@ const app = express();
     },
     filename: (req, file, cb) => {
         const ext = file.mimetype.split("/")[1];
-        //cb(null, `${contenu.name}-${Date.now()}.${ext}`);
-        cb(null, `upload/admin-${file.originalname}-${Date.now()}.${ext}`);
+        cb(null, `upload/${file.originalname}`);
+        //cb(null, file.originalname);
     },
     });
     
@@ -41,16 +45,17 @@ const app = express();
  * @desc pour permettre la creation des cmptes documents par l'admin
  * @access Public
  */
-/*
- router.post('/createDocument', upload.single('myFile'), (req,res) => {
-        DocumentController.createDocument(req,res);
+
+ /*router.post('/createDocument', upload.single('myFile'), (req,res) => {
+    DocumentController.createDocument(req,res);
 });
 */
- router.post('/createDocument',   upload.single('myFile'), passport.authenticate('jwt',{ session: false }),(req, document, res) => {
+ //router.post('/createDocument', passport.authenticate('jwt',{ session: false }),(req, res) => {
+router.post('/createDocument', upload.single('myFile') ,passport.authenticate('jwt',{ session: false }),(req, res) => {
     try {
         helper.checkPermission(req.user.RoleId, 'crud_document').then(rolePerm => {
             if(rolePerm){
-                DocumentController.createDocument(req, document, res)
+                DocumentController.createDocument(req, res)
             }else{
                 return res.json({
                     success: false,
@@ -62,8 +67,17 @@ const app = express();
     } catch ( err) {
         console.log(err)
     }
+    
 });
+/*********************************************************************************************************************************************************************/
 
+router.get("/telecharger/:id", async (req, res) => {
+    //check for the unique id
+    const allDocument = await Document.findByPk(req.params.id);
+    let nb = allDocument.nbTelechargement+1;
+    allDocument.update({nbTelechargement: nb})
+    return res.sendFile(path.join(__dirname + '../../../public/upload/' + allDocument.contenu));
+  });
 
 /****************************************gestion des utilisateurs************************************* */
 /**
@@ -166,7 +180,7 @@ const app = express();
 
  router.get('/TousDocumentsActifs', (req,res) => { 
     req.etat = 'actif';
-    DocumentController.findAllDocumentStateActif(req,res)
+    DocumentController.findAllDocumentState(req,res)
 });
 
 /**
@@ -178,10 +192,7 @@ const app = express();
     try {
         helper.checkPermission(req.user.RoleId, 'touteRecherche').then(rolePerm => {
             if(rolePerm){
-                const req = {
-                    RoleId: 2,
-                    etat: 'bloqué'
-                }
+                req.etat = 'bloqué';
                 DocumentController.findAllDocumentState(req,res)
             }
         } )
@@ -200,10 +211,7 @@ const app = express();
     try {
         helper.checkPermission(req.user.RoleId, 'touteRecherche').then(rolePerm => {
             if(rolePerm){
-                const req = {
-                    RoleId: 2,
-                    etat: 'supprimé'
-                }
+                req.etat = 'supprimé';
                 DocumentController.findAllDocumentState(req,res)
             }
         } )
@@ -218,10 +226,20 @@ const app = express();
  * @access Public
  */
  router.get('/documentActif/:nom' ,(req,res) => {
-    req.RoleId = 2;
     req.etat = 'actif';
-    DocumentController.findOneDocument(req,res);
+    DocumentController.findAllDocumentByName(req,res);
 });
+
+router.get('/documentActifUe/:ue' ,(req,res) => {
+    req.etat = 'actif';
+    DocumentController.findAllDocumentByUe(req,res);
+});
+
+router.get('/documentActifFiliere/:filiere' ,(req,res) => {
+    req.etat = 'actif';
+    DocumentController.findAllDocumentByFiliere(req,res);
+});
+
 
 /**
  * @route get api/users/documentBloque
@@ -252,13 +270,18 @@ const app = express();
         helper.checkPermission(req.user.RoleId, 'touteRecherche').then(rolePerm => {
             if(rolePerm){
                 req.RoleId = 2;
-                req.etat = 'supprime';
+                req.etat = 'supprimé';
                 DocumentController.findOneDocument(req,res);
             }
         } )
     } catch ( err) {
         console.log(err)
     }
+});
+
+
+router.get('/documentOfUser/:id', (req, res) => {
+    DocumentController.findDocumentByUserId(req, res);
 });
 
 module.exports = router;
