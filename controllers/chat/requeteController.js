@@ -8,24 +8,17 @@ const { Op } = require("sequelize");
 
 //create new request conversation
 exports.createConversation = async (req, res) => {
+  console.log("************************")
+  console.log(req)
   
     const requete = await Requete.findOrCreate({
         where: {
-          [Op.or]: [
-            {
+            
               UserReceiverId: req.user.id,
               UserSenderId: req.body.userReceiverId,
               DocumentId: req.body.documentId
-            },
-            {
-              UserSenderId: req.user.id,
-              UserReceiverId: req.body.userReceiverId,
-              DocumentId: req.body.documentId
-            },
-          ],
+            
         },
-      //include: [{ model: User, as: 'UserReceiver' }]
-
         include: { all:true }
     });
   if (requete) {
